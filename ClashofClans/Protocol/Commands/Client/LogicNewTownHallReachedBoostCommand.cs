@@ -1,17 +1,17 @@
-﻿using ClashofClans.Utilities.Netty;
 using ClashofClans.Logic;
+using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Commands.Client
 {
-    class LogicNewTownHallReachedBoostCommand : LogicCommand
-    {
-        public LogicNewTownHallReachedBoostCommand(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-        }
+	class LogicNewTownHallReachedBoostCommand : LogicCommand
+	{
+		public LogicNewTownHallReachedBoostCommand(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+		}
 
-        public override void Decode()
-        {
-            Reader.ReadInt();
-        }
-    }
+		public override void Decode()
+		{
+			Reader.ReadInt();
+		}
+	}
 }

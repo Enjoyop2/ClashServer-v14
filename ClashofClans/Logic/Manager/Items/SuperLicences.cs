@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Text;
+
+using Newtonsoft.Json;
 
 namespace ClashofClans.Logic.Manager.Items
 {
-    public class SuperLicences
-    {
-        [JsonProperty("licence_ends")]
-        public List<int> LicenceEnds { get; set; }
-    }
+	public class SuperLicences
+	{
+		[JsonProperty("licence_ends")]
+		public List<int> LicenceEnds { get; set; }
+	}
 }

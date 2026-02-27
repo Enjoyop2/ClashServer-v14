@@ -1,41 +1,39 @@
-﻿using ClashofClans.Utilities.Netty;
-using ClashofClans.Logic;
-using ClashofClans.Logic.Clan;
-using ClashofClans.Protocol.Messages.Server;
-using ClashofClans.Protocol.Commands.Server;
-using ClashofClans.Logic.Clan.StreamEntry.Entries;
 using ClashofClans.Database;
+using ClashofClans.Logic;
+using ClashofClans.Protocol.Commands.Server;
+using ClashofClans.Protocol.Messages.Server;
+using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Messages.Client.Alliance
 {
-    public class LeaveAllianceMessage : PiranhaMessage
-    {
-        public LeaveAllianceMessage(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-            RequiredState = Device.State.Home;
-        }
+	public class LeaveAllianceMessage : PiranhaMessage
+	{
+		public LeaveAllianceMessage(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+			RequiredState = Device.State.Home;
+		}
 
-        public override async void ProcessAsync()
-        {
-            var home = Device.Player.Home;
-            var alliance = await Resources.Alliances.GetAllianceAsync(home.AllianceInfo.Id);
-            if (alliance == null) return;
+		public override async void ProcessAsync()
+		{
+			Logic.Home.Home home = Device.Player.Home;
+			Logic.Clan.Alliance alliance = await Resources.Alliances.GetAllianceAsync(home.AllianceInfo.Id);
+			if (alliance == null) return;
 
-            alliance.Remove(home.Id);
-            home.AllianceInfo.Reset();
-            Device.Player.Save();
+			alliance.Remove(home.Id);
+			home.AllianceInfo.Reset();
+			Device.Player.Save();
 
-            await new AvailableServerCommandMessage(Device)
-            {
-                Command = new LogicLeaveAllianceCommand(Device)
-                {
-                    AllianceId = alliance.Id
-                }.Handle()
-            }.SendAsync();
+			await new AvailableServerCommandMessage(Device)
+			{
+				Command = new LogicLeaveAllianceCommand(Device)
+				{
+					AllianceId = alliance.Id
+				}.Handle()
+			}.SendAsync();
 
-            if (alliance.Members.Count != 0)
-            {
-                /*var entry = new AllianceEventStreamEntry
+			if (alliance.Members.Count != 0)
+			{
+				/*var entry = new AllianceEventStreamEntry
                 {
                     EventType = AllianceEventStreamEntry.Type.Leave
                 };
@@ -45,12 +43,12 @@ namespace ClashofClans.Protocol.Messages.Client.Alliance
                 alliance.AddEntry(entry);
 
                 alliance.Save();*/
-            }
-            else
-            {
-                await AllianceDb.DeleteAsync(alliance.Id);
-                Resources.ObjectCache.UncacheAlliance(alliance.Id);
-            }
-        }
-    }
+			}
+			else
+			{
+				await AllianceDb.DeleteAsync(alliance.Id);
+				Resources.ObjectCache.UncacheAlliance(alliance.Id);
+			}
+		}
+	}
 }

@@ -1,18 +1,18 @@
-﻿using ClashofClans.Utilities.Netty;
 using ClashofClans.Logic;
 using ClashofClans.Protocol.Messages.Server.Scoring;
+using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Messages.Client.Scoring
 {
-    public class AskForAvatarRankingListMessage : PiranhaMessage
-    {
-        public AskForAvatarRankingListMessage(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-            RequiredState = Device.State.NotDefinied;
-        }
-        public override async void ProcessAsync()
-        {
-            await new AvatarRankingListMessage(Device).SendAsync();
-        }
-    }
+	public class AskForAvatarRankingListMessage : PiranhaMessage
+	{
+		public AskForAvatarRankingListMessage(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+			RequiredState = Device.State.NotDefinied;
+		}
+		public override async void ProcessAsync()
+		{
+			await new AvatarRankingListMessage(Device).SendAsync();
+		}
+	}
 }

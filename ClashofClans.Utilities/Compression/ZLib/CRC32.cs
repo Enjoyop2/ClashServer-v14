@@ -24,20 +24,20 @@ namespace ClashofClans.Utilities.Compression.ZLib
         }
 
         public Crc32(bool reverseBits) :
-            this(unchecked((int) 0xEDB88320), reverseBits)
+            this(unchecked((int)0xEDB88320), reverseBits)
         {
         }
 
         public Crc32(int polynomial, bool reverseBits)
         {
             _reverseBits = reverseBits;
-            _dwPolynomial = (uint) polynomial;
+            _dwPolynomial = (uint)polynomial;
             GenerateLookupTable();
         }
 
         public long TotalBytesRead { get; private set; }
 
-        public int Crc32Result => unchecked((int) ~_register);
+        public int Crc32Result => unchecked((int)~_register);
 
         public int GetCrc32(Stream input)
         {
@@ -51,10 +51,10 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             unchecked
             {
-                var buffer = new byte[BufferSize];
+                byte[] buffer = new byte[BufferSize];
 
                 TotalBytesRead = 0;
-                var count = input.Read(buffer, 0, BufferSize);
+                int count = input.Read(buffer, 0, BufferSize);
                 output?.Write(buffer, 0, count);
                 TotalBytesRead += count;
                 while (count > 0)
@@ -65,18 +65,18 @@ namespace ClashofClans.Utilities.Compression.ZLib
                     TotalBytesRead += count;
                 }
 
-                return (int) ~_register;
+                return (int)~_register;
             }
         }
 
         public int ComputeCrc32(int w, byte b)
         {
-            return InternalComputeCrc32((uint) w, b);
+            return InternalComputeCrc32((uint)w, b);
         }
 
         public int InternalComputeCrc32(uint w, byte b)
         {
-            return (int) (_crc32Table[(w ^ b) & 0xFF] ^ (w >> 8));
+            return (int)(_crc32Table[(w ^ b) & 0xFF] ^ (w >> 8));
         }
 
         public void SlurpBlock(byte[] block, int offset, int count)
@@ -84,18 +84,18 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (block == null)
                 throw new Exception("The data buffer must not be null.");
 
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
-                var x = offset + i;
-                var b = block[x];
+                int x = offset + i;
+                byte b = block[x];
                 if (_reverseBits)
                 {
-                    var temp = (_register >> 24) ^ b;
+                    uint temp = (_register >> 24) ^ b;
                     _register = (_register << 8) ^ _crc32Table[temp];
                 }
                 else
                 {
-                    var temp = (_register & 0x000000FF) ^ b;
+                    uint temp = (_register & 0x000000FF) ^ b;
                     _register = (_register >> 8) ^ _crc32Table[temp];
                 }
             }
@@ -107,12 +107,12 @@ namespace ClashofClans.Utilities.Compression.ZLib
         {
             if (_reverseBits)
             {
-                var temp = (_register >> 24) ^ b;
+                uint temp = (_register >> 24) ^ b;
                 _register = (_register << 8) ^ _crc32Table[temp];
             }
             else
             {
-                var temp = (_register & 0x000000FF) ^ b;
+                uint temp = (_register & 0x000000FF) ^ b;
                 _register = (_register >> 8) ^ _crc32Table[temp];
             }
         }
@@ -122,12 +122,12 @@ namespace ClashofClans.Utilities.Compression.ZLib
             while (n-- > 0)
                 if (_reverseBits)
                 {
-                    var temp = (_register >> 24) ^ b;
+                    uint temp = (_register >> 24) ^ b;
                     _register = (_register << 8) ^ _crc32Table[temp];
                 }
                 else
                 {
-                    var temp = (_register & 0x000000FF) ^ b;
+                    uint temp = (_register & 0x000000FF) ^ b;
                     _register = (_register >> 8) ^ _crc32Table[temp];
                 }
         }
@@ -136,7 +136,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
         {
             unchecked
             {
-                var ret = data;
+                uint ret = data;
                 ret = ((ret & 0x55555555) << 1) | ((ret >> 1) & 0x55555555);
                 ret = ((ret & 0x33333333) << 2) | ((ret >> 2) & 0x33333333);
                 ret = ((ret & 0x0F0F0F0F) << 4) | ((ret >> 4) & 0x0F0F0F0F);
@@ -149,11 +149,11 @@ namespace ClashofClans.Utilities.Compression.ZLib
         {
             unchecked
             {
-                var u = (uint) data * 0x00020202;
+                uint u = (uint)data * 0x00020202;
                 uint m = 0x01044010;
-                var s = u & m;
-                var t = (u << 2) & (m << 1);
-                return (byte) ((0x01001001 * (s + t)) >> 24);
+                uint s = u & m;
+                uint t = (u << 2) & (m << 1);
+                return (byte)((0x01001001 * (s + t)) >> 24);
             }
         }
 
@@ -179,7 +179,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
         private uint Gf2_matrix_times(uint[] matrix, uint vec)
         {
             uint sum = 0;
-            var i = 0;
+            int i = 0;
             while (vec != 0)
             {
                 if ((vec & 0x01) == 0x01)
@@ -193,24 +193,24 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         private void Gf2_matrix_square(uint[] square, uint[] mat)
         {
-            for (var i = 0; i < 32; i++)
+            for (int i = 0; i < 32; i++)
                 square[i] = Gf2_matrix_times(mat, mat[i]);
         }
 
         public void Combine(int crc, int length)
         {
-            var even = new uint[32];
-            var odd = new uint[32];
+            uint[] even = new uint[32];
+            uint[] odd = new uint[32];
 
             if (length == 0)
                 return;
 
-            var crc1 = ~_register;
-            var crc2 = (uint) crc;
+            uint crc1 = ~_register;
+            uint crc2 = (uint)crc;
 
             odd[0] = _dwPolynomial;
             uint row = 1;
-            for (var i = 1; i < 32; i++)
+            for (int i = 1; i < 32; i++)
             {
                 odd[i] = row;
                 row <<= 1;
@@ -219,7 +219,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             Gf2_matrix_square(even, odd);
             Gf2_matrix_square(odd, even);
 
-            var len2 = (uint) length;
+            uint len2 = (uint)length;
 
             do
             {
@@ -318,19 +318,19 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var bytesToRead = count;
+            int bytesToRead = count;
 
             if (_lengthLimit != UnsetLengthLimit)
             {
                 if (_crc32.TotalBytesRead >= _lengthLimit)
                     return 0;
 
-                var bytesRemaining = _lengthLimit - _crc32.TotalBytesRead;
+                long bytesRemaining = _lengthLimit - _crc32.TotalBytesRead;
                 if (bytesRemaining < count)
-                    bytesToRead = (int) bytesRemaining;
+                    bytesToRead = (int)bytesRemaining;
             }
 
-            var n = InnerStream.Read(buffer, offset, bytesToRead);
+            int n = InnerStream.Read(buffer, offset, bytesToRead);
             if (n > 0)
                 _crc32.SlurpBlock(buffer, offset, n);
             return n;

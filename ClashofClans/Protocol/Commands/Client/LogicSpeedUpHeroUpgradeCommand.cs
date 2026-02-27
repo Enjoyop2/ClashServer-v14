@@ -1,23 +1,23 @@
-﻿using ClashofClans.Utilities.Netty;
 using ClashofClans.Logic;
+using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Commands.Client
 {
-    class LogicSpeedUpHeroUpgradeCommand : LogicCommand
-    {
-        public LogicSpeedUpHeroUpgradeCommand(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-        }
+	class LogicSpeedUpHeroUpgradeCommand : LogicCommand
+	{
+		public LogicSpeedUpHeroUpgradeCommand(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+		}
 
-        public override void Decode()
-        {
-            Reader.ReadInt();
-            Reader.ReadInt();
-            Reader.ReadInt();
-            Reader.ReadInt();
-        }
-        public override void Execute()
-        {
-        }
-    }
+		public override void Decode()
+		{
+			Reader.ReadInt();
+			Reader.ReadInt();
+			Reader.ReadInt();
+			Reader.ReadInt();
+		}
+		public override void Execute()
+		{
+		}
+	}
 }

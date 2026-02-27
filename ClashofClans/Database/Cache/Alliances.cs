@@ -1,75 +1,62 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using ClashofClans.Logic.Clan;
 
 namespace ClashofClans.Database.Cache
 {
-    public class Alliances : Dictionary<long, Alliance>
-    {
-        private readonly object _syncObject = new object();
+	public class Alliances : Dictionary<long, Alliance>
+	{
+		private readonly object _syncObject = new object();
 
-        /// <summary>
-        ///     Add an alliance to the server
-        /// </summary>
-        /// <param name="alliance"></param>
-        public void Add(Alliance alliance)
-        {
-            lock (_syncObject)
-            {
-                if (!ContainsKey(alliance.Id)) Add(alliance.Id, alliance);
-            }
-        }
+		public void Add(Alliance alliance)
+		{
+			lock (_syncObject)
+			{
+				if (!ContainsKey(alliance.Id)) Add(alliance.Id, alliance);
+			}
+		}
 
-        /// <summary>
-        ///     Remove an alliance from the server and save it
-        /// </summary>
-        /// <param name="allianceId"></param>
-        public new void Remove(long allianceId)
-        {
-            lock (_syncObject)
-            {
-                if (ContainsKey(allianceId))
-                {
-                    var alliance = this[allianceId];
+		public new void Remove(long allianceId)
+		{
+			lock (_syncObject)
+			{
+				if (ContainsKey(allianceId))
+				{
+					Alliance alliance = this[allianceId];
 
-                    alliance.Save();
+					alliance.Save();
 
-                    var result = base.Remove(allianceId);
+					bool result = base.Remove(allianceId);
 
-                    if (!result)
-                        Logger.Log($"Couldn't remove alliance {allianceId}", GetType(), Logger.ErrorLevel.Error);
-                }
-            }
-        }
+					if (!result)
+						Logger.Log($"Couldn't remove alliance {allianceId}", GetType(), Logger.ErrorLevel.Error);
+				}
+			}
+		}
 
-        /// <summary>
-        ///     Get an alliance from cache or database
-        /// </summary>
-        /// <param name="allianceId"></param>
-        /// <param name="onlineOnly"></param>
-        /// <returns></returns>
-        public async Task<Alliance> GetAllianceAsync(long allianceId, bool onlineOnly = false)
-        {
-            lock (_syncObject)
-            {
-                if (ContainsKey(allianceId))
-                    return this[allianceId];
-            }
+		public async Task<Alliance> GetAllianceAsync(long allianceId, bool onlineOnly = false)
+		{
+			lock (_syncObject)
+			{
+				if (ContainsKey(allianceId))
+					return this[allianceId];
+			}
 
-            if (onlineOnly) return null;
+			if (onlineOnly) return null;
 
-            var alliance = Resources.ObjectCache.GetCachedAlliance(allianceId);
+			Alliance alliance = Resources.ObjectCache.GetCachedAlliance(allianceId);
 
-            if (alliance != null) return alliance;
+			if (alliance != null) return alliance;
 
-            alliance = await AllianceDb.GetAsync(allianceId);
+			alliance = await AllianceDb.GetAsync(allianceId);
 
-            Resources.ObjectCache.CacheAlliance(alliance);
+			Resources.ObjectCache.CacheAlliance(alliance);
 
-            return alliance;
-        }
+			return alliance;
+		}
 
-        /*/// <summary>
+		/*/// <summary>
         ///     Returns a list of random cached Alliances
         /// </summary>
         /// <param name="count"></param>
@@ -97,5 +84,5 @@ namespace ClashofClans.Database.Cache
 
             return alliances;
         }*/
-    }
+	}
 }

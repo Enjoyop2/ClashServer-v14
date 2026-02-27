@@ -7,7 +7,7 @@ namespace ClashofClans.CsvConverter
     {
         internal CsWriter(string name, IReadOnlyList<string> header, string[] types, string space)
         {
-            using var writer = new StreamWriter($"CS Output/{Uppercase(name)}.cs");
+            using StreamWriter writer = new StreamWriter($"CS Output/{Uppercase(name)}.cs");
             writer.WriteLine($"using ClashofClans.Files.CsvHelpers;\nusing ClashofClans.Files.CsvReader;\n\nnamespace ClashofClans.Files.{space}");
             writer.WriteLine("{");
             writer.WriteLine($"    public class {Uppercase(name)} : Data");
@@ -19,11 +19,11 @@ namespace ClashofClans.CsvConverter
             writer.WriteLine("        }");
             writer.WriteLine();
 
-            var count = header.Count;
+            int count = header.Count;
 
-            for (var index = 0; index < count; index++)
+            for (int index = 0; index < count; index++)
             {
-                var type = types[index].ToLower() == "boolean" ? "bool" : types[index].ToLower();
+                string type = types[index].ToLower() == "boolean" ? "bool" : types[index].ToLower();
 
                 writer.WriteLine("        public " + type + " " + header[index].Replace(" ", string.Empty) + " { get; set; }");
 
@@ -40,11 +40,11 @@ namespace ClashofClans.CsvConverter
             if (string.IsNullOrEmpty(_string))
                 return string.Empty;
 
-            var result = _string.Split('_');
-            var newString = string.Empty;
-            foreach (var s in result)
+            string[] result = _string.Split('_');
+            string newString = string.Empty;
+            foreach (string s in result)
             {
-                var _char = s.ToCharArray();
+                char[] _char = s.ToCharArray();
                 _char[0] = char.ToUpper(_char[0]);
 
                 newString += new string(_char);

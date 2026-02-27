@@ -1,47 +1,48 @@
-﻿using System;
+using System;
+
 using ClashofClans.Files.CsvReader;
 
 namespace ClashofClans.Files.CsvHelpers
 {
-    public class Data
-    {
-        private int _dataType;
-        private int _id;
-        protected DataTable DataTable;
-        protected Row Row;
+	public class Data
+	{
+		private int _dataType;
+		private int _id;
+		protected DataTable DataTable;
+		protected Row Row;
 
-        public Data(Row row, DataTable dataTable)
-        {
-            Row = row;
-            DataTable = dataTable;
-        }
+		public Data(Row row, DataTable dataTable)
+		{
+			Row = row;
+			DataTable = dataTable;
+		}
 
-        public void LoadData(Data data, Type type, Row row, int dataType = 0)
-        {
-            _dataType = dataType;
-            _id = GlobalId.CreateGlobalId(_dataType, DataTable.Count());
-            Row = row;
-            Row.LoadData(data);
-        }
+		public void LoadData(Data data, Type type, Row row, int dataType = 0)
+		{
+			_dataType = dataType;
+			_id = GlobalId.CreateGlobalId(_dataType, DataTable.Count());
+			Row = row;
+			Row.LoadData(data);
+		}
 
-        public int GetDataType()
-        {
-            return _dataType;
-        }
+		public int GetDataType()
+		{
+			return _dataType;
+		}
 
-        public int GetGlobalId()
-        {
-            return _id;
-        }
+		public int GetGlobalId()
+		{
+			return _id;
+		}
 
-        public int GetInstanceId()
-        {
-            return GlobalId.GetInstanceId(_id);
-        }
+		public int GetInstanceId()
+		{
+			return GlobalId.GetInstanceId(_id);
+		}
 
-        public string GetName()
-        {
-            return Row.GetName();
-        }
-    }
+		public string GetName()
+		{
+			return Row.GetName();
+		}
+	}
 }

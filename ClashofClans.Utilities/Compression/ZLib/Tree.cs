@@ -4,7 +4,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 {
     internal sealed class Tree
     {
-        internal static readonly sbyte[] BlOrder = {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
+        internal static readonly sbyte[] BlOrder = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 
         internal static readonly int[] DistanceBase =
         {
@@ -12,7 +12,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096, 6144, 8192, 12288, 16384, 24576
         };
 
-        internal static readonly int[] ExtraBlbits = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7};
+        internal static readonly int[] ExtraBlbits = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7 };
 
         internal static readonly int[] ExtraDistanceBits =
         {
@@ -98,7 +98,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal static int Bi_reverse(int code, int len)
         {
-            var res = 0;
+            int res = 0;
             do
             {
                 res |= code & 1;
@@ -118,7 +118,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal static void Gen_codes(short[] tree, int maxCode, short[] blCount)
         {
-            var nextCode = new short[InternalConstants.MAX_BITS + 1];
+            short[] nextCode = new short[InternalConstants.MAX_BITS + 1];
             short code = 0;
             int bits;
             int n;
@@ -126,7 +126,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             for (bits = 1; bits <= InternalConstants.MAX_BITS; bits++)
                 unchecked
                 {
-                    nextCode[bits] = code = (short) ((code + blCount[bits - 1]) << 1);
+                    nextCode[bits] = code = (short)((code + blCount[bits - 1]) << 1);
                 }
 
             for (n = 0; n <= maxCode; n++)
@@ -135,17 +135,17 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 if (len == 0)
                     continue;
 
-                tree[n * 2] = unchecked((short) Bi_reverse(nextCode[len]++, len));
+                tree[n * 2] = unchecked((short)Bi_reverse(nextCode[len]++, len));
             }
         }
 
         internal void Build_tree(DeflateManager s)
         {
-            var tree = DynTree;
-            var stree = StaticTree.treeCodes;
-            var elems = StaticTree.elems;
+            short[] tree = DynTree;
+            short[] stree = StaticTree.treeCodes;
+            int elems = StaticTree.elems;
             int n;
-            var maxCode = -1;
+            int maxCode = -1;
             int node;
 
             s.HeapLen = 0;
@@ -183,14 +183,14 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 n = s.Heap[1];
                 s.Heap[1] = s.Heap[s.HeapLen--];
                 s.Pqdownheap(tree, 1);
-                var m = s.Heap[1];
+                int m = s.Heap[1];
 
                 s.Heap[--s.HeapMax] = n;
                 s.Heap[--s.HeapMax] = m;
 
-                tree[node * 2] = unchecked((short) (tree[n * 2] + tree[m * 2]));
-                s.Depth[node] = (sbyte) (Math.Max((byte) s.Depth[n], (byte) s.Depth[m]) + 1);
-                tree[n * 2 + 1] = tree[m * 2 + 1] = (short) node;
+                tree[node * 2] = unchecked((short)(tree[n * 2] + tree[m * 2]));
+                s.Depth[node] = (sbyte)(Math.Max((byte)s.Depth[n], (byte)s.Depth[m]) + 1);
+                tree[n * 2 + 1] = tree[m * 2 + 1] = (short)node;
 
                 s.Heap[1] = node++;
                 s.Pqdownheap(tree, 1);
@@ -204,15 +204,15 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal void Gen_bitlen(DeflateManager s)
         {
-            var tree = DynTree;
-            var stree = StaticTree.treeCodes;
-            var extra = StaticTree.extraBits;
-            var baseRenamed = StaticTree.extraBase;
-            var maxLength = StaticTree.maxLength;
+            short[] tree = DynTree;
+            short[] stree = StaticTree.treeCodes;
+            int[] extra = StaticTree.extraBits;
+            int baseRenamed = StaticTree.extraBase;
+            int maxLength = StaticTree.maxLength;
             int h;
             int n;
             int bits;
-            var overflow = 0;
+            int overflow = 0;
 
             for (bits = 0; bits <= InternalConstants.MAX_BITS; bits++)
                 s.BlCount[bits] = 0;
@@ -229,16 +229,16 @@ namespace ClashofClans.Utilities.Compression.ZLib
                     overflow++;
                 }
 
-                tree[n * 2 + 1] = (short) bits;
+                tree[n * 2 + 1] = (short)bits;
 
                 if (n > MaxCode)
                     continue;
 
                 s.BlCount[bits]++;
-                var xbits = 0;
+                int xbits = 0;
                 if (n >= baseRenamed)
                     xbits = extra[n - baseRenamed];
-                var f = tree[n * 2];
+                short f = tree[n * 2];
                 s.OptLen += f * (bits + xbits);
                 if (stree != null)
                     s.StaticLen += f * (stree[n * 2 + 1] + xbits);
@@ -253,7 +253,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 while (s.BlCount[bits] == 0)
                     bits--;
                 s.BlCount[bits]--;
-                s.BlCount[bits + 1] = (short) (s.BlCount[bits + 1] + 2);
+                s.BlCount[bits + 1] = (short)(s.BlCount[bits + 1] + 2);
                 s.BlCount[maxLength]--;
                 overflow -= 2;
             } while (overflow > 0);
@@ -263,14 +263,14 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 n = s.BlCount[bits];
                 while (n != 0)
                 {
-                    var m = s.Heap[--h];
+                    int m = s.Heap[--h];
                     if (m > MaxCode)
                         continue;
 
                     if (tree[m * 2 + 1] != bits)
                     {
-                        s.OptLen = (int) (s.OptLen + (bits - (long) tree[m * 2 + 1]) * tree[m * 2]);
-                        tree[m * 2 + 1] = (short) bits;
+                        s.OptLen = (int)(s.OptLen + (bits - (long)tree[m * 2 + 1]) * tree[m * 2]);
+                        tree[m * 2 + 1] = (short)bits;
                     }
 
                     n--;

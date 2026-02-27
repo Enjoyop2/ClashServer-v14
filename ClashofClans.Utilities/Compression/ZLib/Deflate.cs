@@ -187,11 +187,11 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal void InitializeBlocks()
         {
-            for (var i = 0; i < InternalConstants.L_CODES; i++)
+            for (int i = 0; i < InternalConstants.L_CODES; i++)
                 DynLtree[i * 2] = 0;
-            for (var i = 0; i < InternalConstants.D_CODES; i++)
+            for (int i = 0; i < InternalConstants.D_CODES; i++)
                 DynDtree[i * 2] = 0;
-            for (var i = 0; i < InternalConstants.BL_CODES; i++)
+            for (int i = 0; i < InternalConstants.BL_CODES; i++)
                 BlTree[i * 2] = 0;
 
             DynLtree[EndBlock * 2] = 1;
@@ -201,8 +201,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal void Pqdownheap(short[] tree, int k)
         {
-            var v = Heap[k];
-            var j = k << 1;
+            int v = Heap[k];
+            int j = k << 1;
             while (j <= HeapLen)
             {
                 if (j < HeapLen && IsSmaller(tree, Heap[j + 1], Heap[j], Depth)) j++;
@@ -219,19 +219,19 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal static bool IsSmaller(short[] tree, int n, int m, sbyte[] depth)
         {
-            var tn2 = tree[n * 2];
-            var tm2 = tree[m * 2];
+            short tn2 = tree[n * 2];
+            short tm2 = tree[m * 2];
             return tn2 < tm2 || tn2 == tm2 && depth[n] <= depth[m];
         }
 
         internal void Scan_tree(short[] tree, int maxCode)
         {
             int n;
-            var prevlen = -1;
+            int prevlen = -1;
             int nextlen = tree[0 * 2 + 1];
-            var count = 0;
-            var maxCount = 7;
-            var minCount = 4;
+            int count = 0;
+            int maxCount = 7;
+            int minCount = 4;
 
             if (nextlen == 0)
             {
@@ -243,13 +243,13 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             for (n = 0; n <= maxCode; n++)
             {
-                var curlen = nextlen;
+                int curlen = nextlen;
                 nextlen = tree[(n + 1) * 2 + 1];
                 if (++count < maxCount && curlen == nextlen) continue;
 
                 if (count < minCount)
                 {
-                    BlTree[curlen * 2] = (short) (BlTree[curlen * 2] + count);
+                    BlTree[curlen * 2] = (short)(BlTree[curlen * 2] + count);
                 }
                 else if (curlen != 0)
                 {
@@ -319,11 +319,11 @@ namespace ClashofClans.Utilities.Compression.ZLib
         internal void Send_tree(short[] tree, int maxCode)
         {
             int n;
-            var prevlen = -1;
+            int prevlen = -1;
             int nextlen = tree[0 * 2 + 1];
-            var count = 0;
-            var maxCount = 7;
-            var minCount = 4;
+            int count = 0;
+            int maxCount = 7;
+            int minCount = 4;
 
             if (nextlen == 0)
             {
@@ -333,7 +333,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             for (n = 0; n <= maxCode; n++)
             {
-                var curlen = nextlen;
+                int curlen = nextlen;
                 nextlen = tree[(n + 1) * 2 + 1];
                 if (++count < maxCount && curlen == nextlen) continue;
 
@@ -394,27 +394,27 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal void Send_code(int c, short[] tree)
         {
-            var c2 = c * 2;
+            int c2 = c * 2;
             Send_bits(tree[c2] & 0xffff, tree[c2 + 1] & 0xffff);
         }
 
         internal void Send_bits(int value, int length)
         {
-            var len = length;
+            int len = length;
             unchecked
             {
                 if (BiValid > BufSize - len)
                 {
-                    BiBuf |= (short) ((value << BiValid) & 0xffff);
-                    Pending[PendingCount++] = (byte) BiBuf;
-                    Pending[PendingCount++] = (byte) (BiBuf >> 8);
+                    BiBuf |= (short)((value << BiValid) & 0xffff);
+                    Pending[PendingCount++] = (byte)BiBuf;
+                    Pending[PendingCount++] = (byte)(BiBuf >> 8);
 
-                    BiBuf = (short) ((uint) value >> (BufSize - BiValid));
+                    BiBuf = (short)((uint)value >> (BufSize - BiValid));
                     BiValid += len - BufSize;
                 }
                 else
                 {
-                    BiBuf |= (short) ((value << BiValid) & 0xffff);
+                    BiBuf |= (short)((value << BiValid) & 0xffff);
                     BiValid += len;
                 }
             }
@@ -439,9 +439,9 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal bool Tr_tally(int dist, int lc)
         {
-            Pending[DistanceOffset + LastLit * 2] = unchecked((byte) ((uint) dist >> 8));
-            Pending[DistanceOffset + LastLit * 2 + 1] = unchecked((byte) dist);
-            Pending[LengthOffset + LastLit] = unchecked((byte) lc);
+            Pending[DistanceOffset + LastLit * 2] = unchecked((byte)((uint)dist >> 8));
+            Pending[DistanceOffset + LastLit * 2 + 1] = unchecked((byte)dist);
+            Pending[LengthOffset + LastLit] = unchecked((byte)lc);
             LastLit++;
 
             if (dist == 0)
@@ -456,14 +456,14 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 DynDtree[Tree.DistanceCode(dist) * 2]++;
             }
 
-            if ((LastLit & 0x1fff) != 0 || (int) CompressionLevel <= 2)
+            if ((LastLit & 0x1fff) != 0 || (int)CompressionLevel <= 2)
                 return LastLit == LitBufsize - 1 || LastLit == LitBufsize;
 
-            var outLength = LastLit << 3;
-            var inLength = Strstart - BlockStart;
+            int outLength = LastLit << 3;
+            int inLength = Strstart - BlockStart;
             int dcode;
             for (dcode = 0; dcode < InternalConstants.D_CODES; dcode++)
-                outLength = (int) (outLength + DynDtree[dcode * 2] * (5L + Tree.ExtraDistanceBits[dcode]));
+                outLength = (int)(outLength + DynDtree[dcode * 2] * (5L + Tree.ExtraDistanceBits[dcode]));
             outLength >>= 3;
             if (Matches < LastLit / 2 && outLength < inLength / 2)
                 return true;
@@ -473,15 +473,15 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal void send_compressed_block(short[] ltree, short[] dtree)
         {
-            var lx = 0;
+            int lx = 0;
 
             if (LastLit != 0)
                 do
                 {
-                    var ix = DistanceOffset + lx * 2;
-                    var distance = ((Pending[ix] << 8) & 0xff00) |
+                    int ix = DistanceOffset + lx * 2;
+                    int distance = ((Pending[ix] << 8) & 0xff00) |
                                    (Pending[ix + 1] & 0xff);
-                    var lc = Pending[LengthOffset + lx] & 0xff;
+                    int lc = Pending[LengthOffset + lx] & 0xff;
                     lx++;
 
                     if (distance == 0)
@@ -493,7 +493,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                         int code = Tree.LengthCode[lc];
 
                         Send_code(code + InternalConstants.LITERALS + 1, ltree);
-                        var extra = Tree.ExtraLengthBits[code];
+                        int extra = Tree.ExtraLengthBits[code];
                         if (extra != 0)
                         {
                             lc -= Tree.LengthBase[code];
@@ -519,9 +519,9 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal void Set_data_type()
         {
-            var n = 0;
-            var asciiFreq = 0;
-            var binFreq = 0;
+            int n = 0;
+            int asciiFreq = 0;
+            int binFreq = 0;
             while (n < 7)
             {
                 binFreq += DynLtree[n * 2];
@@ -540,21 +540,21 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 n++;
             }
 
-            DataType = (sbyte) (binFreq > asciiFreq >> 2 ? ZBinary : ZAscii);
+            DataType = (sbyte)(binFreq > asciiFreq >> 2 ? ZBinary : ZAscii);
         }
 
         internal void Bi_flush()
         {
             if (BiValid == 16)
             {
-                Pending[PendingCount++] = (byte) BiBuf;
-                Pending[PendingCount++] = (byte) (BiBuf >> 8);
+                Pending[PendingCount++] = (byte)BiBuf;
+                Pending[PendingCount++] = (byte)(BiBuf >> 8);
                 BiBuf = 0;
                 BiValid = 0;
             }
             else if (BiValid >= 8)
             {
-                Pending[PendingCount++] = (byte) BiBuf;
+                Pending[PendingCount++] = (byte)BiBuf;
                 BiBuf >>= 8;
                 BiValid -= 8;
             }
@@ -564,12 +564,12 @@ namespace ClashofClans.Utilities.Compression.ZLib
         {
             if (BiValid > 8)
             {
-                Pending[PendingCount++] = (byte) BiBuf;
-                Pending[PendingCount++] = (byte) (BiBuf >> 8);
+                Pending[PendingCount++] = (byte)BiBuf;
+                Pending[PendingCount++] = (byte)(BiBuf >> 8);
             }
             else if (BiValid > 0)
             {
-                Pending[PendingCount++] = (byte) BiBuf;
+                Pending[PendingCount++] = (byte)BiBuf;
             }
 
             BiBuf = 0;
@@ -584,10 +584,10 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (header)
                 unchecked
                 {
-                    Pending[PendingCount++] = (byte) len;
-                    Pending[PendingCount++] = (byte) (len >> 8);
-                    Pending[PendingCount++] = (byte) ~len;
-                    Pending[PendingCount++] = (byte) (~len >> 8);
+                    Pending[PendingCount++] = (byte)len;
+                    Pending[PendingCount++] = (byte)(len >> 8);
+                    Pending[PendingCount++] = (byte)~len;
+                    Pending[PendingCount++] = (byte)(~len >> 8);
                 }
 
             Put_bytes(Window, buf, len);
@@ -602,7 +602,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal BlockState DeflateNone(FlushType flush)
         {
-            var maxBlockSize = 0xffff;
+            int maxBlockSize = 0xffff;
 
             if (maxBlockSize > Pending.Length - 5) maxBlockSize = Pending.Length - 5;
 
@@ -621,7 +621,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 Strstart += Lookahead;
                 Lookahead = 0;
 
-                var maxStart = BlockStart + maxBlockSize;
+                int maxStart = BlockStart + maxBlockSize;
                 if (Strstart == 0 || Strstart >= maxStart)
                 {
                     Lookahead = Strstart - maxStart;
@@ -655,7 +655,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
         internal void Tr_flush_block(int buf, int storedLen, bool eof)
         {
             int optLenb, staticLenb;
-            var maxBlindex = 0;
+            int maxBlindex = 0;
 
             if (CompressionLevel > 0)
             {
@@ -703,7 +703,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
         {
             do
             {
-                var more = WindowSize - Lookahead - Strstart;
+                int more = WindowSize - Lookahead - Strstart;
 
                 int n;
                 switch (more)
@@ -715,36 +715,36 @@ namespace ClashofClans.Utilities.Compression.ZLib
                         more--;
                         break;
                     default:
-                    {
-                        if (Strstart >= WSize + WSize - MinLookahead)
                         {
-                            Array.Copy(Window, WSize, Window, 0, WSize);
-                            MatchStart -= WSize;
-                            Strstart -= WSize;
-                            BlockStart -= WSize;
-
-                            n = HashSize;
-                            var p = n;
-                            int m;
-                            do
+                            if (Strstart >= WSize + WSize - MinLookahead)
                             {
-                                m = Head[--p] & 0xffff;
-                                Head[p] = (short) (m >= WSize ? m - WSize : 0);
-                            } while (--n != 0);
+                                Array.Copy(Window, WSize, Window, 0, WSize);
+                                MatchStart -= WSize;
+                                Strstart -= WSize;
+                                BlockStart -= WSize;
 
-                            n = WSize;
-                            p = n;
-                            do
-                            {
-                                m = Prev[--p] & 0xffff;
-                                Prev[p] = (short) (m >= WSize ? m - WSize : 0);
-                            } while (--n != 0);
+                                n = HashSize;
+                                int p = n;
+                                int m;
+                                do
+                                {
+                                    m = Head[--p] & 0xffff;
+                                    Head[p] = (short)(m >= WSize ? m - WSize : 0);
+                                } while (--n != 0);
 
-                            more += WSize;
+                                n = WSize;
+                                p = n;
+                                do
+                                {
+                                    m = Prev[--p] & 0xffff;
+                                    Prev[p] = (short)(m >= WSize ? m - WSize : 0);
+                                } while (--n != 0);
+
+                                more += WSize;
+                            }
+
+                            break;
                         }
-
-                        break;
-                    }
                 }
 
                 if (Codec.AvailableBytesIn == 0)
@@ -762,7 +762,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal BlockState DeflateFast(FlushType flush)
         {
-            var hashHead = 0;
+            int hashHead = 0;
 
             while (true)
             {
@@ -780,7 +780,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                     InsH = ((InsH << HashShift) ^ (Window[Strstart + (MinMatch - 1)] & 0xff)) & HashMask;
                     hashHead = Head[InsH] & 0xffff;
                     Prev[Strstart & WMask] = Head[InsH];
-                    Head[InsH] = unchecked((short) Strstart);
+                    Head[InsH] = unchecked((short)Strstart);
                 }
 
                 if (hashHead != 0L && ((Strstart - hashHead) & 0xffff) <= WSize - MinLookahead)
@@ -803,7 +803,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                             InsH = ((InsH << HashShift) ^ (Window[Strstart + (MinMatch - 1)] & 0xff)) & HashMask;
                             hashHead = Head[InsH] & 0xffff;
                             Prev[Strstart & WMask] = Head[InsH];
-                            Head[InsH] = unchecked((short) Strstart);
+                            Head[InsH] = unchecked((short)Strstart);
                         } while (--MatchLength != 0);
 
                         Strstart++;
@@ -840,7 +840,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal BlockState DeflateSlow(FlushType flush)
         {
-            var hashHead = 0;
+            int hashHead = 0;
 
             while (true)
             {
@@ -859,7 +859,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                     InsH = ((InsH << HashShift) ^ (Window[Strstart + (MinMatch - 1)] & 0xff)) & HashMask;
                     hashHead = Head[InsH] & 0xffff;
                     Prev[Strstart & WMask] = Head[InsH];
-                    Head[InsH] = unchecked((short) Strstart);
+                    Head[InsH] = unchecked((short)Strstart);
                 }
 
                 PrevLength = MatchLength;
@@ -879,7 +879,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 bool bflush;
                 if (PrevLength >= MinMatch && MatchLength <= PrevLength)
                 {
-                    var maxInsert = Strstart + Lookahead - MinMatch;
+                    int maxInsert = Strstart + Lookahead - MinMatch;
                     bflush = Tr_tally(Strstart - 1 - PrevMatch, PrevLength - MinMatch);
 
                     Lookahead -= PrevLength - 1;
@@ -891,7 +891,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                         InsH = ((InsH << HashShift) ^ (Window[Strstart + (MinMatch - 1)] & 0xff)) & HashMask;
                         hashHead = Head[InsH] & 0xffff;
                         Prev[Strstart & WMask] = Head[InsH];
-                        Head[InsH] = unchecked((short) Strstart);
+                        Head[InsH] = unchecked((short)Strstart);
                     } while (--PrevLength != 0);
 
                     MatchAvailable = 0;
@@ -938,18 +938,18 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal int Longest_match(int curMatch)
         {
-            var chainLength = _config.MaxChainLength;
-            var scan = Strstart;
-            var bestLen = PrevLength;
-            var limit = Strstart > WSize - MinLookahead ? Strstart - (WSize - MinLookahead) : 0;
+            int chainLength = _config.MaxChainLength;
+            int scan = Strstart;
+            int bestLen = PrevLength;
+            int limit = Strstart > WSize - MinLookahead ? Strstart - (WSize - MinLookahead) : 0;
 
-            var niceLength = _config.NiceLength;
+            int niceLength = _config.NiceLength;
 
-            var wmask = WMask;
+            int wmask = WMask;
 
-            var strend = Strstart + MaxMatch;
-            var scanEnd1 = Window[scan + bestLen - 1];
-            var scanEnd = Window[scan + bestLen];
+            int strend = Strstart + MaxMatch;
+            byte scanEnd1 = Window[scan + bestLen - 1];
+            byte scanEnd = Window[scan + bestLen];
 
             if (PrevLength >= _config.GoodLength) chainLength >>= 2;
 
@@ -958,7 +958,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             do
             {
-                var match = curMatch;
+                int match = curMatch;
 
                 if (Window[match + bestLen] != scanEnd ||
                     Window[match + bestLen - 1] != scanEnd1 ||
@@ -980,7 +980,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                          Window[++scan] == Window[++match] &&
                          Window[++scan] == Window[++match] && scan < strend);
 
-                var len = MaxMatch - (strend - scan);
+                int len = MaxMatch - (strend - scan);
                 scan = strend - MaxMatch;
 
                 if (len <= bestLen) continue;
@@ -1066,7 +1066,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             Status = WantRfc1950HeaderBytes ? InitState : BusyState;
             Codec._Adler32 = Adler.Adler32(0, null, 0, 0);
 
-            LastFlush = (int) FlushType.None;
+            LastFlush = (int)FlushType.None;
 
             InitializeTreeData();
             InitializeLazyMatch();
@@ -1104,11 +1104,11 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal int SetParams(CompressionLevel level, CompressionStrategy strategy)
         {
-            var result = ZlibConstants.ZOk;
+            int result = ZlibConstants.ZOk;
 
             if (CompressionLevel != level)
             {
-                var newConfig = Config.Lookup(level);
+                Config newConfig = Config.Lookup(level);
 
                 if (newConfig.Flavor != _config.Flavor && Codec.TotalBytesIn != 0)
                     result = Codec.Deflate(FlushType.Partial);
@@ -1125,8 +1125,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal int SetDictionary(byte[] dictionary)
         {
-            var length = dictionary.Length;
-            var index = 0;
+            int length = dictionary.Length;
+            int index = 0;
 
             if (dictionary == null || Status != InitState)
                 throw new ZlibException("Stream error.");
@@ -1149,11 +1149,11 @@ namespace ClashofClans.Utilities.Compression.ZLib
             InsH = Window[0] & 0xff;
             InsH = ((InsH << HashShift) ^ (Window[1] & 0xff)) & HashMask;
 
-            for (var n = 0; n <= length - MinMatch; n++)
+            for (int n = 0; n <= length - MinMatch; n++)
             {
                 InsH = ((InsH << HashShift) ^ (Window[n + (MinMatch - 1)] & 0xff)) & HashMask;
                 Prev[n & WMask] = Head[InsH];
-                Head[InsH] = (short) n;
+                Head[InsH] = (short)n;
             }
 
             return ZlibConstants.ZOk;
@@ -1175,13 +1175,13 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 throw new ZlibException("OutputBuffer is full (AvailableBytesOut == 0)");
             }
 
-            var oldFlush = LastFlush;
-            LastFlush = (int) flush;
+            int oldFlush = LastFlush;
+            LastFlush = (int)flush;
 
             if (Status == InitState)
             {
-                var header = (ZDeflated + ((WBits - 8) << 4)) << 8;
-                var levelFlags = (((int) CompressionLevel - 1) & 0xff) >> 1;
+                int header = (ZDeflated + ((WBits - 8) << 4)) << 8;
+                int levelFlags = (((int)CompressionLevel - 1) & 0xff) >> 1;
 
                 if (levelFlags > 3)
                     levelFlags = 3;
@@ -1193,16 +1193,16 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 Status = BusyState;
                 unchecked
                 {
-                    Pending[PendingCount++] = (byte) (header >> 8);
-                    Pending[PendingCount++] = (byte) header;
+                    Pending[PendingCount++] = (byte)(header >> 8);
+                    Pending[PendingCount++] = (byte)header;
                 }
 
                 if (Strstart != 0)
                 {
-                    Pending[PendingCount++] = (byte) ((Codec._Adler32 & 0xFF000000) >> 24);
-                    Pending[PendingCount++] = (byte) ((Codec._Adler32 & 0x00FF0000) >> 16);
-                    Pending[PendingCount++] = (byte) ((Codec._Adler32 & 0x0000FF00) >> 8);
-                    Pending[PendingCount++] = (byte) (Codec._Adler32 & 0x000000FF);
+                    Pending[PendingCount++] = (byte)((Codec._Adler32 & 0xFF000000) >> 24);
+                    Pending[PendingCount++] = (byte)((Codec._Adler32 & 0x00FF0000) >> 16);
+                    Pending[PendingCount++] = (byte)((Codec._Adler32 & 0x0000FF00) >> 8);
+                    Pending[PendingCount++] = (byte)(Codec._Adler32 & 0x000000FF);
                 }
 
                 Codec._Adler32 = Adler.Adler32(0, null, 0, 0);
@@ -1218,7 +1218,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 }
             }
             else if (Codec.AvailableBytesIn == 0 &&
-                     (int) flush <= oldFlush &&
+                     (int)flush <= oldFlush &&
                      flush != FlushType.Finish)
             {
                 return ZlibConstants.ZOk;
@@ -1232,41 +1232,41 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             if (Codec.AvailableBytesIn != 0 || Lookahead != 0 || flush != FlushType.None && Status != FinishState)
             {
-                var bstate = _deflateFunction(flush);
+                BlockState bstate = _deflateFunction(flush);
 
                 if (bstate == BlockState.FinishStarted || bstate == BlockState.FinishDone) Status = FinishState;
                 switch (bstate)
                 {
                     case BlockState.NeedMore:
                     case BlockState.FinishStarted:
-                    {
-                        if (Codec.AvailableBytesOut == 0) LastFlush = -1;
-                        return ZlibConstants.ZOk;
-                    }
-
-                    case BlockState.BlockDone:
-                    {
-                        if (flush == FlushType.Partial)
                         {
-                            Tr_align();
-                        }
-                        else
-                        {
-                            Tr_stored_block(0, 0, false);
-                            if (flush == FlushType.Full)
-                                for (var i = 0; i < HashSize; i++)
-                                    Head[i] = 0;
-                        }
-
-                        Codec.Flush_pending();
-                        if (Codec.AvailableBytesOut == 0)
-                        {
-                            LastFlush = -1;
+                            if (Codec.AvailableBytesOut == 0) LastFlush = -1;
                             return ZlibConstants.ZOk;
                         }
 
-                        break;
-                    }
+                    case BlockState.BlockDone:
+                        {
+                            if (flush == FlushType.Partial)
+                            {
+                                Tr_align();
+                            }
+                            else
+                            {
+                                Tr_stored_block(0, 0, false);
+                                if (flush == FlushType.Full)
+                                    for (int i = 0; i < HashSize; i++)
+                                        Head[i] = 0;
+                            }
+
+                            Codec.Flush_pending();
+                            if (Codec.AvailableBytesOut == 0)
+                            {
+                                LastFlush = -1;
+                                return ZlibConstants.ZOk;
+                            }
+
+                            break;
+                        }
                 }
             }
 
@@ -1276,10 +1276,10 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (!WantRfc1950HeaderBytes || _rfc1950BytesEmitted)
                 return ZlibConstants.ZStreamEnd;
 
-            Pending[PendingCount++] = (byte) ((Codec._Adler32 & 0xFF000000) >> 24);
-            Pending[PendingCount++] = (byte) ((Codec._Adler32 & 0x00FF0000) >> 16);
-            Pending[PendingCount++] = (byte) ((Codec._Adler32 & 0x0000FF00) >> 8);
-            Pending[PendingCount++] = (byte) (Codec._Adler32 & 0x000000FF);
+            Pending[PendingCount++] = (byte)((Codec._Adler32 & 0xFF000000) >> 24);
+            Pending[PendingCount++] = (byte)((Codec._Adler32 & 0x00FF0000) >> 16);
+            Pending[PendingCount++] = (byte)((Codec._Adler32 & 0x0000FF00) >> 8);
+            Pending[PendingCount++] = (byte)(Codec._Adler32 & 0x000000FF);
 
             Codec.Flush_pending();
 
@@ -1328,7 +1328,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             public static Config Lookup(CompressionLevel level)
             {
-                return Table[(int) level];
+                return Table[(int)level];
             }
         }
     }

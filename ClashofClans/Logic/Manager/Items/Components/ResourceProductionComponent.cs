@@ -1,114 +1,117 @@
-﻿using System;
+using System;
+
 using ClashofClans.Files;
+using ClashofClans.Files.Logic;
 using ClashofClans.Logic.Manager.Items.GameObjects;
+
 using Newtonsoft.Json.Linq;
 
 namespace ClashofClans.Logic.Manager.Items.Components
 {
-    public class ResourceProductionComponent : Component
-    {
-        public string ProducesResource;
-        public int ResourceMax;
-        public int ResourcePer100Hours;
+	public class ResourceProductionComponent : Component
+	{
+		public string ProducesResource;
+		public int ResourceMax;
+		public int ResourcePer100Hours;
 
-        public Timer Timer;
+		public Timer Timer;
 
-        public ResourceProductionComponent(GameObject gameObject) : base(gameObject)
-        {
-            Type = 5;
-            Timer = new Timer();
-            SetProduction();
-        }
+		public ResourceProductionComponent(GameObject gameObject) : base(gameObject)
+		{
+			Type = 5;
+			Timer = new Timer();
+			SetProduction();
+		}
 
-        public int MaxTime => ResourcePer100Hours > 0 ? (int) (360000L * ResourceMax / ResourcePer100Hours) : 0;
+		public int MaxTime => ResourcePer100Hours > 0 ? (int)(360000L * ResourceMax / ResourcePer100Hours) : 0;
 
-        public Files.Logic.Resources ResourceData =>
-            Csv.Tables.Get(Csv.Files.Resources).GetData<Files.Logic.Resources>(ProducesResource);
+		public Files.Logic.Resources ResourceData =>
+			Csv.Tables.Get(Csv.Files.Resources).GetData<Files.Logic.Resources>(ProducesResource);
 
-        public int AvailableToCollect
-        {
-            get
-            {
-                if (ResourcePer100Hours <= 0) return 0;
-                var remainingSeconds = Timer.GetRemainingSeconds(Parent.Home.Time);
-                if (remainingSeconds <= 0) return ResourceMax;
+		public int AvailableToCollect
+		{
+			get
+			{
+				if (ResourcePer100Hours <= 0) return 0;
+				int remainingSeconds = Timer.GetRemainingSeconds(Parent.Home.Time);
+				if (remainingSeconds <= 0) return ResourceMax;
 
-                var timeGone = MaxTime - remainingSeconds;
-                var perSecondProduced = (double) ResourcePer100Hours / 360000;
-                var available = Math.Round(perSecondProduced * timeGone, MidpointRounding.ToZero);
-                return (int) available;
-            }
-        }
+				int timeGone = MaxTime - remainingSeconds;
+				double perSecondProduced = (double)ResourcePer100Hours / 360000;
+				double available = Math.Round(perSecondProduced * timeGone, MidpointRounding.ToZero);
+				return (int)available;
+			}
+		}
 
-        public void CollectResources()
-        {
-            var availableToCollect = AvailableToCollect;
-            if (availableToCollect <= 0) return;
+		public void CollectResources()
+		{
+			int availableToCollect = AvailableToCollect;
+			if (availableToCollect <= 0) return;
 
-            var collectedResources = Parent.Home.AddResourceByName(ProducesResource, availableToCollect);
+			int collectedResources = Parent.Home.AddResourceByName(ProducesResource, availableToCollect);
 
-            RemoveResources(collectedResources, availableToCollect == collectedResources);
-        }
+			RemoveResources(collectedResources, availableToCollect == collectedResources);
+		}
 
-        public void RemoveResources(int amount, bool all = false)
-        {
-            if (all)
-            {
-                Timer.StartTimer(Parent.Home.Time, MaxTime);
-                return;
-            }
+		public void RemoveResources(int amount, bool all = false)
+		{
+			if (all)
+			{
+				Timer.StartTimer(Parent.Home.Time, MaxTime);
+				return;
+			}
 
-            var time = 360000L * amount / ResourcePer100Hours;
-            Timer.IncreaseTimer((int) time);
-        }
+			long time = 360000L * amount / ResourcePer100Hours;
+			Timer.IncreaseTimer((int)time);
+		}
 
-        public void SetProduction()
-        {
-            var building = (Building) Parent;
-            var buildingData = building.BuildingData;
+		public void SetProduction()
+		{
+			Building building = (Building)Parent;
+			Buildings buildingData = building.BuildingData;
 
-            var lvl = building.GetUpgradeLevel();
-            if (lvl >= 0 && !building.Locked)
-            {
-                ProducesResource = buildingData.ProducesResource;
-                ResourcePer100Hours = buildingData.ResourcePer100Hours[lvl];
-                ResourceMax = buildingData.ResourceMax[lvl];
+			int lvl = building.GetUpgradeLevel();
+			if (lvl >= 0 && !building.Locked)
+			{
+				ProducesResource = buildingData.ProducesResource;
+				ResourcePer100Hours = buildingData.ResourcePer100Hours[lvl];
+				ResourceMax = buildingData.ResourceMax[lvl];
 
-                Timer.StartTimer(building.Home.Time, MaxTime);
-            }
-            else
-            {
-                ProducesResource = null;
-                ResourcePer100Hours = 0;
-                ResourceMax = 0;
-            }
-        }
+				Timer.StartTimer(building.Home.Time, MaxTime);
+			}
+			else
+			{
+				ProducesResource = null;
+				ResourcePer100Hours = 0;
+				ResourceMax = 0;
+			}
+		}
 
-        public override void FastForward(int seconds)
-        {
-            Timer.FastForward(seconds);
-        }
+		public override void FastForward(int seconds)
+		{
+			Timer.FastForward(seconds);
+		}
 
-        public override JObject Save(JObject jObject)
-        {
-            jObject.Add("res_time", Timer.GetRemainingSeconds(Parent.Home.Time));
+		public override JObject Save(JObject jObject)
+		{
+			jObject.Add("res_time", Timer.GetRemainingSeconds(Parent.Home.Time));
 
-            return jObject;
-        }
+			return jObject;
+		}
 
-        public override void Load(JObject jObject)
-        {
-            if (!jObject.ContainsKey("res_time"))
-            {
-                Timer.StartTimer(Parent.Home.Time, MaxTime);
-                return;
-            }
+		public override void Load(JObject jObject)
+		{
+			if (!jObject.ContainsKey("res_time"))
+			{
+				Timer.StartTimer(Parent.Home.Time, MaxTime);
+				return;
+			}
 
-            var resTime = jObject["res_time"].ToObject<int>();
-            if (resTime <= MaxTime && resTime > -1)
-            {
-                Timer.StartTimer(Parent.Home.Time, resTime);
-            }
-        }
-    }
+			int resTime = jObject["res_time"].ToObject<int>();
+			if (resTime <= MaxTime && resTime > -1)
+			{
+				Timer.StartTimer(Parent.Home.Time, resTime);
+			}
+		}
+	}
 }

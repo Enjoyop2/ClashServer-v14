@@ -62,7 +62,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
     {
         public static int UrShift(int number, int bits)
         {
-            return (int) ((uint) number >> bits);
+            return (int)((uint)number >> bits);
         }
 
 #if NOT
@@ -96,15 +96,15 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (target.Length == 0)
                 return 0;
 
-            var charArray = new char[target.Length];
-            var bytesRead = sourceTextReader.Read(charArray, start, count);
+            char[] charArray = new char[target.Length];
+            int bytesRead = sourceTextReader.Read(charArray, start, count);
 
             // Returns -1 if EOF
             if (bytesRead == 0)
                 return -1;
 
-            for (var index = start; index < start + bytesRead; index++)
-                target[index] = (byte) charArray[index];
+            for (int index = start; index < start + bytesRead; index++)
+                target[index] = (byte)charArray[index];
 
             return bytesRead;
         }
@@ -260,12 +260,12 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (buf == null)
                 return 1;
 
-            var s1 = adler & 0xffff;
-            var s2 = (adler >> 16) & 0xffff;
+            uint s1 = adler & 0xffff;
+            uint s2 = (adler >> 16) & 0xffff;
 
             while (len > 0)
             {
-                var k = len < NMAX ? len : NMAX;
+                int k = len < NMAX ? len : NMAX;
                 len -= k;
                 while (k >= 16)
                 {

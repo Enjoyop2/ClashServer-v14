@@ -1,6 +1,6 @@
-﻿using System;
-using ClashofClans.Utilities.Netty;
+﻿using ClashofClans.Utilities.Netty;
 using DotNetty.Buffers;
+using System;
 
 namespace ClashofClans.Analyzer
 {
@@ -8,17 +8,17 @@ namespace ClashofClans.Analyzer
     {
         public static void Main()
         {
-            var hex = "0000008b955f0a04000000030000025b0000000100000000000002150000000500000021000000141dcd650600000021000000121dcd650700000021000000161dcd650800000021000000131dcd650900000021000000151dcd650a00000039000002150000000500000021000000141dcd650600000021000000121dcd650700000021000000161dcd650800000021000000131dcd650900000021000000151dcd650a0000004b";
+            string hex = "0000008b955f0a04000000030000025b0000000100000000000002150000000500000021000000141dcd650600000021000000121dcd650700000021000000161dcd650800000021000000131dcd650900000021000000151dcd650a00000039000002150000000500000021000000141dcd650600000021000000121dcd650700000021000000161dcd650800000021000000131dcd650900000021000000151dcd650a0000004b";
             hex = hex.Replace(" ", string.Empty);
 
-            var buffer = Unpooled.Buffer();
+            IByteBuffer buffer = Unpooled.Buffer();
             //buffer.WriteHex(hex);
 
             buffer.SetReaderIndex(0);
 
             //DecodeHeader(buffer);
 
-            for(var i = 0; i < 42; i++)
+            for (int i = 0; i < 42; i++)
                 Console.WriteLine($"packet.WriteInt({buffer.ReadInt()});");
 
             //DecodeLogicClientHome(buffer);
@@ -143,64 +143,64 @@ namespace ClashofClans.Analyzer
 
             Console.WriteLine(buffer.ReadByte());
 
-            var recourceCapCount = buffer.ReadInt();
-            for (var i = 0; i < recourceCapCount; i++)
+            int recourceCapCount = buffer.ReadInt();
+            for (int i = 0; i < recourceCapCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var resourceCount = buffer.ReadInt();
-            for (var i = 0; i < resourceCount; i++)
+            int resourceCount = buffer.ReadInt();
+            for (int i = 0; i < resourceCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var troopCount = buffer.ReadInt();
-            for (var i = 0; i < troopCount; i++)
+            int troopCount = buffer.ReadInt();
+            for (int i = 0; i < troopCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var spellCount = buffer.ReadInt();
-            for (var i = 0; i < spellCount; i++)
+            int spellCount = buffer.ReadInt();
+            for (int i = 0; i < spellCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var troopLevelCount = buffer.ReadInt();
-            for (var i = 0; i < troopLevelCount; i++)
+            int troopLevelCount = buffer.ReadInt();
+            for (int i = 0; i < troopLevelCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var spellLevelCount = buffer.ReadInt();
-            for (var i = 0; i < spellLevelCount; i++)
+            int spellLevelCount = buffer.ReadInt();
+            for (int i = 0; i < spellLevelCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var heroLevelCount = buffer.ReadInt();
-            for (var i = 0; i < heroLevelCount; i++)
+            int heroLevelCount = buffer.ReadInt();
+            for (int i = 0; i < heroLevelCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var heroHealthCount = buffer.ReadInt();
-            for (var i = 0; i < heroHealthCount; i++)
+            int heroHealthCount = buffer.ReadInt();
+            for (int i = 0; i < heroHealthCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var heroStateCount = buffer.ReadInt();
-            for (var i = 0; i < heroStateCount; i++)
+            int heroStateCount = buffer.ReadInt();
+            for (int i = 0; i < heroStateCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
@@ -208,8 +208,8 @@ namespace ClashofClans.Analyzer
 
             Console.WriteLine($"ClanUnits: {buffer.ReadInt()}");
 
-            var unknownCount = buffer.ReadInt();
-            for (var i = 0; i < unknownCount; i++)
+            int unknownCount = buffer.ReadInt();
+            for (int i = 0; i < unknownCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
@@ -217,21 +217,21 @@ namespace ClashofClans.Analyzer
 
             Console.WriteLine(buffer.ReadInt());
 
-            var missionCount = buffer.ReadInt();
-            for (var i = 0; i < missionCount; i++)
+            int missionCount = buffer.ReadInt();
+            for (int i = 0; i < missionCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var achivementCount = buffer.ReadInt();
-            for (var i = 0; i < achivementCount; i++)
+            int achivementCount = buffer.ReadInt();
+            for (int i = 0; i < achivementCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
             }
 
-            var completedAchivementCount = buffer.ReadInt();
-            for (var i = 0; i < completedAchivementCount; i++)
+            int completedAchivementCount = buffer.ReadInt();
+            for (int i = 0; i < completedAchivementCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
@@ -239,8 +239,8 @@ namespace ClashofClans.Analyzer
 
             Console.WriteLine(buffer.ReadInt());
 
-            var npcCount = buffer.ReadInt();
-            for (var i = 0; i < npcCount; i++)
+            int npcCount = buffer.ReadInt();
+            for (int i = 0; i < npcCount; i++)
             {
                 Console.WriteLine(buffer.ReadInt());
                 Console.WriteLine(buffer.ReadInt());
@@ -255,7 +255,7 @@ namespace ClashofClans.Analyzer
 
             Console.WriteLine($"packet.WriteInt({buffer.ReadInt()});");
 
-            for (var i = 0; i < 97; i++)
+            for (int i = 0; i < 97; i++)
             {
                 Console.WriteLine($"packet.WriteInt({buffer.ReadInt()});");
             }

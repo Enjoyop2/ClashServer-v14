@@ -1,7 +1,6 @@
-﻿using System;
+﻿using ClashofClans.Utilities.Netty;
+using System;
 using System.Text;
-using ClashofClans.Utilities.Netty;
-using DotNetty.Buffers;
 
 namespace ClashofClans.Utilities.Crypto
 {
@@ -21,7 +20,7 @@ namespace ClashofClans.Utilities.Crypto
             I = (byte)((I + 1) % 256);
             J = (byte)((J + Key[I]) % 256);
 
-            var temp = Key[I];
+            byte temp = Key[I];
             Key[I] = Key[J];
             Key[J] = temp;
 
@@ -30,18 +29,18 @@ namespace ClashofClans.Utilities.Crypto
 
         public static byte[] Ksa(byte[] key)
         {
-            var s = new byte[256];
+            byte[] s = new byte[256];
 
-            for (var i = 0; i != 256; i++)
+            for (int i = 0; i != 256; i++)
                 s[i] = (byte)i;
 
             byte j = 0;
 
-            for (var i = 0; i != 256; i++)
+            for (int i = 0; i != 256; i++)
             {
                 j = (byte)((j + s[i] + key[i % key.Length]) % 256);
 
-                var temp = s[i];
+                byte temp = s[i];
                 s[i] = s[j];
                 s[j] = temp;
             }
@@ -65,8 +64,8 @@ namespace ClashofClans.Utilities.Crypto
         {
             get
             {
-                var random = new Random();
-                var buffer = new byte[random.Next(15, 25)];
+                Random random = new Random();
+                byte[] buffer = new byte[random.Next(15, 25)];
                 random.NextBytes(buffer);
                 return buffer;
             }
@@ -74,18 +73,18 @@ namespace ClashofClans.Utilities.Crypto
 
         public void Encrypt(ref ByteBuffer data)
         {
-            for (var k = 0; k < data.ReadableBytes; k++)
+            for (int k = 0; k < data.ReadableBytes; k++)
             {
-                var b = data.GetByte(k) ^ Encryptor.Prga();
+                int b = data.GetByte(k) ^ Encryptor.Prga();
                 data.SetByte(k, b);
             }
         }
 
         public void Decrypt(ref ByteBuffer data)
         {
-            for (var k = 0; k < data.ReadableBytes; k++)
+            for (int k = 0; k < data.ReadableBytes; k++)
             {
-                var b = data.GetByte(k) ^ Decryptor.Prga();
+                int b = data.GetByte(k) ^ Decryptor.Prga();
                 data.SetByte(k, b);
             }
         }
@@ -95,7 +94,7 @@ namespace ClashofClans.Utilities.Crypto
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            for (var k = 0; k < data.Length; k++)
+            for (int k = 0; k < data.Length; k++)
                 data[k] ^= Encryptor.Prga();
         }
 
@@ -104,7 +103,7 @@ namespace ClashofClans.Utilities.Crypto
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            for (var k = 0; k < data.Length; k++)
+            for (int k = 0; k < data.Length; k++)
                 data[k] ^= Decryptor.Prga();
         }
 
@@ -113,7 +112,7 @@ namespace ClashofClans.Utilities.Crypto
             Encryptor = new Rc4(key);
             Decryptor = new Rc4(key);
 
-            for (var k = 0; k < key.Length; k++)
+            for (int k = 0; k < key.Length; k++)
             {
                 Encryptor.Prga();
                 Decryptor.Prga();

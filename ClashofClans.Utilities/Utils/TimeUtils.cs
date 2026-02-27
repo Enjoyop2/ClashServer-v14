@@ -8,13 +8,13 @@ namespace ClashofClans.Utilities.Utils
         {
             get
             {
-                var now = DateTime.UtcNow;
+                DateTime now = DateTime.UtcNow;
 
                 if (now.Month != 12)
-                    return (int) (new DateTime(now.Year, now.Month + 1, 1, now.Hour,
+                    return (int)(new DateTime(now.Year, now.Month + 1, 1, now.Hour,
                                       now.Minute, now.Second) - now).TotalSeconds;
 
-                return (int) (new DateTime(now.Year + 1, 1, 1, now.Hour,
+                return (int)(new DateTime(now.Year + 1, 1, 1, now.Hour,
                                   now.Minute, now.Second) - now).TotalSeconds;
             }
         }
@@ -23,24 +23,24 @@ namespace ClashofClans.Utilities.Utils
         {
             get
             {
-                var now = DateTime.UtcNow;
-                var tomorrow = now.AddDays(1).Date;
+                DateTime now = DateTime.UtcNow;
+                DateTime tomorrow = now.AddDays(1).Date;
 
-                return (int) (tomorrow - now).TotalSeconds;
+                return (int)(tomorrow - now).TotalSeconds;
             }
         }
         public static int LeaderboardTimer
         {
             get
             {
-                var now = DateTime.UtcNow;
+                DateTime now = DateTime.UtcNow;
 
-                var secondsInMonth = DateTime.DaysInMonth(now.Year, now.Month) * 86400;
+                int secondsInMonth = DateTime.DaysInMonth(now.Year, now.Month) * 86400;
                 int currentSeconds = (now.Day - 1) * 86400 + now.Hour * 3600 + now.Minute * 60 + now.Second;
                 return secondsInMonth - currentSeconds;
             }
         }
 
-        public static int CurrentUnixTimestamp => (int) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+        public static int CurrentUnixTimestamp => (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
     }
 }

@@ -1,29 +1,29 @@
-﻿using ClashofClans.Utilities.Netty;
 using ClashofClans.Logic;
+using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Commands.Client
 {
-    public class LogicPlaceHeroCommand : LogicCommand
-    {
-        public LogicPlaceHeroCommand(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-        }
+	public class LogicPlaceHeroCommand : LogicCommand
+	{
+		public LogicPlaceHeroCommand(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+		}
 
-        public override void Decode()
-        {
-            Reader.ReadInt();
-            Reader.ReadInt(); // HeroId
+		public override void Decode()
+		{
+			Reader.ReadInt();
+			Reader.ReadInt(); // HeroId
 
-            Reader.ReadVInt();
-            Reader.ReadVInt();
-        }
+			Reader.ReadVInt();
+			Reader.ReadVInt();
+		}
 
-        public override void Execute()
-        {
-            if (!Device.Player.Home.Battle.GetBattleStatus() && Device.CurrentBattleType == Device.BattleType.Multiplayer)
-            {
-                Device.Player.Home.Battle.StartBattle(Device);
-            }
-        }
-    }
+		public override void Execute()
+		{
+			if (!Device.Player.Home.Battle.GetBattleStatus() && Device.CurrentBattleType == Device.BattleType.Multiplayer)
+			{
+				Device.Player.Home.Battle.StartBattle(Device);
+			}
+		}
+	}
 }

@@ -33,14 +33,14 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (byteIndex < 0 || byteIndex > bytes.Length)
                 throw new ArgumentOutOfRangeException(nameof(byteIndex));
 
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
-                var c = chars[start + i];
+                char c = chars[start + i];
 
                 if (c >= '\x00FF')
-                    bytes[byteIndex + i] = (byte) '?';
+                    bytes[byteIndex + i] = (byte)'?';
                 else
-                    bytes[byteIndex + i] = (byte) c;
+                    bytes[byteIndex + i] = (byte)c;
             }
 
             return count;
@@ -70,8 +70,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (charIndex < 0 || charIndex > chars.Length)
                 throw new ArgumentOutOfRangeException(nameof(charIndex));
 
-            for (var i = 0; i < count; i++)
-                chars[charIndex + i] = (char) bytes[i + start];
+            for (int i = 0; i < count; i++)
+                chars[charIndex + i] = (char)bytes[i + start];
 
             return count;
         }

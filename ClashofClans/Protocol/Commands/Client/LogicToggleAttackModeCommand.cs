@@ -1,40 +1,45 @@
-﻿using ClashofClans.Utilities.Netty;
+using System.Collections.Generic;
+
 using ClashofClans.Logic;
+using ClashofClans.Logic.Home;
+using ClashofClans.Logic.Manager;
+using ClashofClans.Logic.Manager.Items.GameObjects;
+using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Commands.Client
 {
-    public class LogicToggleAttackModeCommand : LogicCommand
-    {
-        public LogicToggleAttackModeCommand(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-        }
+	public class LogicToggleAttackModeCommand : LogicCommand
+	{
+		public LogicToggleAttackModeCommand(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+		}
 
-        private int BuildingId { get; set; }
+		private int BuildingId { get; set; }
 
-        public override void Decode()
-        {
-            BuildingId = Reader.ReadInt();
-            Reader.ReadInt();
+		public override void Decode()
+		{
+			BuildingId = Reader.ReadInt();
+			Reader.ReadInt();
 
-            Reader.ReadBoolean();
-            Reader.ReadBoolean();
+			Reader.ReadBoolean();
+			Reader.ReadBoolean();
 
-            Reader.ReadInt();
-        }
-        public override void Execute()
-        {
-            var home = Device.Player.Home;
-            var objects = home.GameObjectManager;
+			Reader.ReadInt();
+		}
+		public override void Execute()
+		{
+			Home home = Device.Player.Home;
+			GameObjectManager objects = home.GameObjectManager;
 
-            var buildings = objects.GetBuildings();
+			List<Building> buildings = objects.GetBuildings();
 
-            var index = buildings.FindIndex(b => b.Id == BuildingId);
+			int index = buildings.FindIndex(b => b.Id == BuildingId);
 
-            if (index > -1)
-            {
-                var building = buildings[index];
-                building.AttackMode = !building.AttackMode;
-            }
-        }
-    }
+			if (index > -1)
+			{
+				Building building = buildings[index];
+				building.AttackMode = !building.AttackMode;
+			}
+		}
+	}
 }

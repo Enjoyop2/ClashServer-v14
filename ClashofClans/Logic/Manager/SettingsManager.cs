@@ -1,16 +1,14 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using ClashofClans.Logic.Manager.Items;
+using Newtonsoft.Json;
 
 namespace ClashofClans.Logic.Manager
 {
-    public class SettingsManager
-    {
-        [JsonProperty("triggerHeroAbilityOnDeath")] public int TriggerHeroAbilityOnDeath { get; set; }
+	public class SettingsManager
+	{
+		[JsonProperty("triggerHeroAbilityOnDeath")] public int TriggerHeroAbilityOnDeath { get; set; }
 
-        public void SetTriggerHeroAbilityOnDeath(int state)
-        {
-            TriggerHeroAbilityOnDeath = state;
-        }
-    }
+		public void SetTriggerHeroAbilityOnDeath(int state)
+		{
+			TriggerHeroAbilityOnDeath = state;
+		}
+	}
 }

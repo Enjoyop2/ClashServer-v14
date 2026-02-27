@@ -1,30 +1,30 @@
-﻿using ClashofClans.Utilities.Netty;
 using ClashofClans.Logic;
 using ClashofClans.Protocol.Messages.Server.Account;
+using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Commands.Client
 {
-    public class LogicBuyDailyDealItemCommand : LogicCommand
-    {
-        public LogicBuyDailyDealItemCommand(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-        }
+	public class LogicBuyDailyDealItemCommand : LogicCommand
+	{
+		public LogicBuyDailyDealItemCommand(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+		}
 
-        public int ItemId { get; set; }
+		public int ItemId { get; set; }
 
-        public override void Decode()
-        {
-            base.Decode();
+		public override void Decode()
+		{
+			base.Decode();
 
-            ItemId = Reader.ReadInt();
-        }
+			ItemId = Reader.ReadInt();
+		}
 
-        public override async void Execute()
-        {
-            await new LoginFailedMessage(Device)
-            {
-                Reason = "DailyDeals haven't been implemented yet."
-            }.SendAsync();
-        }
-    }
+		public override async void Execute()
+		{
+			await new LoginFailedMessage(Device)
+			{
+				Reason = "DailyDeals haven't been implemented yet."
+			}.SendAsync();
+		}
+	}
 }

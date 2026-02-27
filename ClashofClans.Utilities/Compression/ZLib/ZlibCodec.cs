@@ -46,29 +46,29 @@ namespace ClashofClans.Utilities.Compression.ZLib
             switch (mode)
             {
                 case CompressionMode.Compress:
-                {
-                    var rc = InitializeDeflate();
-                    if (rc != ZlibConstants.ZOk)
-                        throw new ZlibException("Cannot initialize for deflate.");
+                    {
+                        int rc = InitializeDeflate();
+                        if (rc != ZlibConstants.ZOk)
+                            throw new ZlibException("Cannot initialize for deflate.");
 
-                    break;
-                }
+                        break;
+                    }
 
                 case CompressionMode.Decompress:
-                {
-                    var rc = InitializeInflate();
-                    if (rc != ZlibConstants.ZOk)
-                        throw new ZlibException("Cannot initialize for inflate.");
+                    {
+                        int rc = InitializeInflate();
+                        if (rc != ZlibConstants.ZOk)
+                            throw new ZlibException("Cannot initialize for inflate.");
 
-                    break;
-                }
+                        break;
+                    }
 
                 default:
                     throw new ZlibException("Invalid ZlibStreamFlavor.");
             }
         }
 
-        public int Adler32 => (int) _Adler32;
+        public int Adler32 => (int)_Adler32;
 
         public int InitializeInflate()
         {
@@ -109,7 +109,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (Istate == null)
                 throw new ZlibException("No Inflate State!");
 
-            var ret = Istate.End();
+            int ret = Istate.End();
             Istate = null;
             return ret;
         }
@@ -158,7 +158,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (Istate != null)
                 throw new ZlibException("You may not call InitializeDeflate() after calling InitializeInflate().");
 
-            Dstate = new DeflateManager {WantRfc1950HeaderBytes = wantRfc1950Header};
+            Dstate = new DeflateManager { WantRfc1950HeaderBytes = wantRfc1950Header };
 
             return Dstate.Initialize(this, CompressLevel, WindowBits, Strategy);
         }
@@ -210,7 +210,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal void Flush_pending()
         {
-            var len = Dstate.PendingCount;
+            int len = Dstate.PendingCount;
 
             if (len > AvailableBytesOut)
                 len = AvailableBytesOut;
@@ -236,7 +236,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         internal int Read_buf(byte[] buf, int start, int size)
         {
-            var len = AvailableBytesIn;
+            int len = AvailableBytesIn;
 
             if (len > size)
                 len = size;

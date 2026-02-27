@@ -134,7 +134,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
         {
             InitWorkArea(19);
             Hn[0] = 0;
-            var result = Huft_build(c, 0, 19, 19, null, null, tb, bb, hp, Hn, V);
+            int result = Huft_build(c, 0, 19, 19, null, null, tb, bb, hp, Hn, V);
 
             if (result == ZDataError)
             {
@@ -154,7 +154,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
         {
             InitWorkArea(288);
             Hn[0] = 0;
-            var result = Huft_build(c, 0, nl, 257, Cplens, Cplext, tl, bl, hp, Hn, V);
+            int result = Huft_build(c, 0, nl, 257, Cplens, Cplext, tl, bl, hp, Hn, V);
             if (result != ZOk || bl[0] == 0)
             {
                 if (result == ZDataError)
@@ -185,15 +185,15 @@ namespace ClashofClans.Utilities.Compression.ZLib
                     result = ZDataError;
                     break;
                 default:
-                {
-                    if (result != ZMemError)
                     {
-                        z.Message = "empty distance tree with lengths";
-                        result = ZDataError;
-                    }
+                        if (result != ZMemError)
+                        {
+                            z.Message = "empty distance tree with lengths";
+                            result = ZDataError;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
             }
 
             return result;
@@ -207,8 +207,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
             int j;
             int y;
 
-            var p = 0;
-            var i = n;
+            int p = 0;
+            int i = n;
             do
             {
                 C[b[bindex + p]]++;
@@ -223,18 +223,18 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 return ZOk;
             }
 
-            var l = m[0];
+            int l = m[0];
             for (j = 1; j <= Bmax; j++)
                 if (C[j] != 0)
                     break;
 
-            var k = j;
+            int k = j;
             if (l < j) l = j;
             for (i = Bmax; i != 0; i--)
                 if (C[i] != 0)
                     break;
 
-            var g = i;
+            int g = i;
             if (l > i) l = i;
             m[0] = l;
 
@@ -248,7 +248,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             X[1] = j = 0;
             p = 1;
-            var xp = 2;
+            int xp = 2;
             while (--i != 0)
             {
                 X[xp] = j += C[p];
@@ -268,15 +268,15 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             X[0] = i = 0;
             p = 0;
-            var h = -1;
-            var w = -l;
+            int h = -1;
+            int w = -l;
             U[0] = 0;
-            var q = 0;
-            var z = 0;
+            int q = 0;
+            int z = 0;
 
             for (; k <= g; k++)
             {
-                var a = C[k];
+                int a = C[k];
                 while (a-- != 0)
                 {
                     int f;
@@ -311,8 +311,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
                         if (h != 0)
                         {
                             X[h] = i;
-                            R[0] = (sbyte) j;
-                            R[1] = (sbyte) l;
+                            R[0] = (sbyte)j;
+                            R[1] = (sbyte)l;
                             j = SharedUtils.UrShift(i, w - l);
                             R[2] = q - U[h - 1] - j;
                             Array.Copy(R, 0, hp, (U[h - 1] + j) * 3, 3);
@@ -323,19 +323,19 @@ namespace ClashofClans.Utilities.Compression.ZLib
                         }
                     }
 
-                    R[1] = (sbyte) (k - w);
+                    R[1] = (sbyte)(k - w);
                     if (p >= n)
                     {
                         R[0] = 128 + 64;
                     }
                     else if (v[p] < s)
                     {
-                        R[0] = (sbyte) (v[p] < 256 ? 0 : 32 + 64);
+                        R[0] = (sbyte)(v[p] < 256 ? 0 : 32 + 64);
                         R[2] = v[p++];
                     }
                     else
                     {
-                        R[0] = (sbyte) (e[v[p] - s] + 16 + 64);
+                        R[0] = (sbyte)(e[v[p] - s] + 16 + 64);
                         R[2] = d[v[p++] - s];
                     }
 
@@ -345,7 +345,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                     for (j = 1 << (k - 1); (i & j) != 0; j = SharedUtils.UrShift(j, 1)) i ^= j;
                     i ^= j;
 
-                    var mask = (1 << w) - 1;
+                    int mask = (1 << w) - 1;
                     while ((i & mask) != X[h])
                     {
                         h--;

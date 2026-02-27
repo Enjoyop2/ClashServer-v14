@@ -1,28 +1,28 @@
-﻿using ClashofClans.Logic;
+using ClashofClans.Logic;
 using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Commands.Client
 {
-    public class LogicSwapBuildingsCommand : LogicCommand
-    {
-        public LogicSwapBuildingsCommand(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-        }
+	public class LogicSwapBuildingsCommand : LogicCommand
+	{
+		public LogicSwapBuildingsCommand(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+		}
 
-        public int ObjectOne { get; set; }
-        public int ObjectTwo { get; set; }
+		public int ObjectOne { get; set; }
+		public int ObjectTwo { get; set; }
 
-        public override void Decode()
-        {
-            ObjectOne = Reader.ReadInt();
-            ObjectTwo = Reader.ReadInt();
+		public override void Decode()
+		{
+			ObjectOne = Reader.ReadInt();
+			ObjectTwo = Reader.ReadInt();
 
-            base.Decode();
-        }
+			base.Decode();
+		}
 
-        public override void Execute()
-        {
-            /*var home = Device.Player.Home;
+		public override void Execute()
+		{
+			/*var home = Device.Player.Home;
 
             if (BuildingId - 504000000 < 0)
             {
@@ -51,6 +51,6 @@ namespace ClashofClans.Protocol.Commands.Client
             {
                 Device.Disconnect("Unhandled object.");
             }*/
-        }
-    }
+		}
+	}
 }

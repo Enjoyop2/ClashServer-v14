@@ -27,7 +27,7 @@ namespace ClashofClans.Utilities.Utils
 
         public static string GetChecksum(string text)
         {
-            using (var hasher = new SHA1CryptoServiceProvider())
+            using (SHA1CryptoServiceProvider hasher = new SHA1CryptoServiceProvider())
             {
                 return hasher.ComputeHash(Encoding.UTF8.GetBytes(text)).Aggregate(string.Empty,
                     (current, num) => current + num.ToString("x2"));
@@ -36,7 +36,7 @@ namespace ClashofClans.Utilities.Utils
 
         public static string GetChecksum(byte[] data)
         {
-            using (var hasher = new SHA1CryptoServiceProvider())
+            using (SHA1CryptoServiceProvider hasher = new SHA1CryptoServiceProvider())
             {
                 return hasher.ComputeHash(data).Aggregate(string.Empty,
                     (current, num) => current + num.ToString("x2"));

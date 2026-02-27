@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ClashofClans.CsvConverter.Extensions;
+using System;
 using System.IO;
 using System.Linq;
-using ClashofClans.CsvConverter.Extensions;
 
 namespace ClashofClans.CsvConverter
 {
@@ -30,18 +30,18 @@ namespace ClashofClans.CsvConverter
             }
 
             Console.Write("Enter name (e.g. Logic): ");
-            var name = Console.ReadLine();
+            string name = Console.ReadLine();
 
             if (Directory.GetFiles("CSV Input").Any())
             {
-                var files = Directory.GetFiles("CSV Input");
+                string[] files = Directory.GetFiles("CSV Input");
 
-                foreach (var file in files)
+                foreach (string file in files)
                 {
                     if (Path.GetExtension(file) != ".csv") continue;
 
-                    var header = File.ReadLines(file).ToList()[0].Replace("\"", "").Split(',');
-                    var types = File.ReadLines(file).ToList()[1].Replace("\"", "").Split(',');
+                    string[] header = File.ReadLines(file).ToList()[0].Replace("\"", "").Split(',');
+                    string[] types = File.ReadLines(file).ToList()[1].Replace("\"", "").Split(',');
 
                     new CsWriter(Path.GetFileNameWithoutExtension(file), header, types, name);
 

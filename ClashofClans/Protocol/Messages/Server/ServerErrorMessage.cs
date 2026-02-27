@@ -1,20 +1,19 @@
-﻿using ClashofClans.Logic;
-using ClashofClans.Utilities.Netty;
+using ClashofClans.Logic;
 
 namespace ClashofClans.Protocol.Messages.Server
 {
-    public class ServerErrorMessage : PiranhaMessage
-    {
-        public ServerErrorMessage(Device device) : base(device)
-        {
-            Id = 24115;
-        }
+	public class ServerErrorMessage : PiranhaMessage
+	{
+		public ServerErrorMessage(Device device) : base(device)
+		{
+			Id = 24115;
+		}
 
-        public string Reason { get; set; }
+		public string Reason { get; set; }
 
-        public override void EncodeAsync()
-        {
-            Writer.WriteString(Reason);
-        }
-    }
+		public override void EncodeAsync()
+		{
+			Writer.WriteString(Reason);
+		}
+	}
 }

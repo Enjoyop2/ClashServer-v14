@@ -183,7 +183,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (_disposed)
                 throw new ObjectDisposedException("GZipStream");
 
-            var n = BaseStream.Read(buffer, offset, count);
+            int n = BaseStream.Read(buffer, offset, count);
 
             if (_firstReadDone) return n;
 
@@ -221,19 +221,19 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         private int EmitHeader()
         {
-            var commentBytes = Comment == null ? null : Iso8859dash1.GetBytes(Comment);
-            var filenameBytes = FileName == null ? null : Iso8859dash1.GetBytes(FileName);
+            byte[] commentBytes = Comment == null ? null : Iso8859dash1.GetBytes(Comment);
+            byte[] filenameBytes = FileName == null ? null : Iso8859dash1.GetBytes(FileName);
 
             if (commentBytes != null)
             {
-                var cbLength = Comment == null ? 0 : commentBytes.Length + 1;
+                int cbLength = Comment == null ? 0 : commentBytes.Length + 1;
                 if (filenameBytes != null)
                 {
-                    var fnLength = FileName == null ? 0 : filenameBytes.Length + 1;
+                    int fnLength = FileName == null ? 0 : filenameBytes.Length + 1;
 
-                    var bufferLength = 10 + cbLength + fnLength;
-                    var header = new byte[bufferLength];
-                    var i = 0;
+                    int bufferLength = 10 + cbLength + fnLength;
+                    byte[] header = new byte[bufferLength];
+                    int i = 0;
 
                     header[i++] = 0x1F;
                     header[i++] = 0x8B;
@@ -249,8 +249,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
                     if (!LastModified.HasValue)
                         LastModified = DateTime.Now;
-                    var delta = LastModified.Value - UnixEpoch;
-                    var timet = (int) delta.TotalSeconds;
+                    TimeSpan delta = LastModified.Value - UnixEpoch;
+                    int timet = (int)delta.TotalSeconds;
                     Array.Copy(BitConverter.GetBytes(timet), 0, header, i, 4);
                     i += 4;
 
@@ -282,7 +282,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static byte[] CompressString(string s)
         {
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
                 Stream compressor =
                     new GZipStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
@@ -293,7 +293,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static byte[] CompressBuffer(byte[] b)
         {
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
                 Stream compressor =
                     new GZipStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
@@ -305,7 +305,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static string UncompressString(byte[] compressed)
         {
-            using (var input = new MemoryStream(compressed))
+            using (MemoryStream input = new MemoryStream(compressed))
             {
                 Stream decompressor = new GZipStream(input, CompressionMode.Decompress);
                 return ZlibBaseStream.UncompressString(decompressor);
@@ -314,7 +314,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static byte[] UncompressBuffer(byte[] compressed)
         {
-            using (var input = new MemoryStream(compressed))
+            using (MemoryStream input = new MemoryStream(compressed))
             {
                 Stream decompressor =
                     new GZipStream(input, CompressionMode.Decompress);

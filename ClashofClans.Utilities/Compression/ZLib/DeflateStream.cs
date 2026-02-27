@@ -137,7 +137,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static byte[] CompressBuffer(byte[] b)
         {
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
                 Stream compressor =
                     new DeflateStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
@@ -149,7 +149,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static byte[] CompressString(string s)
         {
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
                 Stream compressor =
                     new DeflateStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
@@ -160,7 +160,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static byte[] UncompressBuffer(byte[] compressed)
         {
-            using (var input = new MemoryStream(compressed))
+            using (MemoryStream input = new MemoryStream(compressed))
             {
                 Stream decompressor =
                     new DeflateStream(input, CompressionMode.Decompress);
@@ -171,7 +171,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static string UncompressString(byte[] compressed)
         {
-            using (var input = new MemoryStream(compressed))
+            using (MemoryStream input = new MemoryStream(compressed))
             {
                 Stream decompressor =
                     new DeflateStream(input, CompressionMode.Decompress);

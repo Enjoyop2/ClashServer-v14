@@ -1,48 +1,50 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+
 using ClashofClans.Logic;
 using ClashofClans.Utilities.Utils;
 
 namespace ClashofClans.Protocol.Messages.Server.Scoring
 {
-    public class AvatarRankingListMessage : PiranhaMessage
-    {
-        public AvatarRankingListMessage(Device device) : base(device)
-        {
-            Id = 26679;
-        }
-        private Player player { get; set; }
-        public override void EncodeAsync()
-        {
-            Resources.Leaderboard.Update(null, null);
-            var players = Resources.Leaderboard.GlobalPlayerRanking;
-            var count = players.Count;
+	public class AvatarRankingListMessage : PiranhaMessage
+	{
+		public AvatarRankingListMessage(Device device) : base(device)
+		{
+			Id = 26679;
+		}
+		private Player player { get; set; }
+		public override void EncodeAsync()
+		{
+			Resources.Leaderboard.Update(null, null);
+			List<Player> players = Resources.Leaderboard.GlobalPlayerRanking;
+			int count = players.Count;
 
-            Writer.WriteInt(count);
+			Writer.WriteInt(count);
 
-            for (int i = 0; i < count; i++)
-            {
-                player = players[i];
+			for (int i = 0; i < count; i++)
+			{
+				player = players[i];
 
-                player.AvatarRankingEntry(Writer, i + 1);
-            }
+				player.AvatarRankingEntry(Writer, i + 1);
+			}
 
-            players = Resources.Leaderboard.GlobalPreviousSeasonPlayerRanking;
-            count = players.Count;
+			players = Resources.Leaderboard.GlobalPreviousSeasonPlayerRanking;
+			count = players.Count;
 
-            Writer.WriteInt(count);
+			Writer.WriteInt(count);
 
-            for (int i = 0; i < count; i++)
-            {
-                player = players[i];
+			for (int i = 0; i < count; i++)
+			{
+				player = players[i];
 
-                player.AvatarRankingEntry(Writer, i + 1, true);
-            }
+				player.AvatarRankingEntry(Writer, i + 1, true);
+			}
 
-            Writer.WriteInt(TimeUtils.LeaderboardTimer);
-            Writer.WriteInt(DateTime.Now.Year);
-            Writer.WriteInt(DateTime.Now.Month);
-            Writer.WriteInt(DateTime.Now.Year);
-            Writer.WriteInt(DateTime.Now.Month - 1);
-        }
-    }
+			Writer.WriteInt(TimeUtils.LeaderboardTimer);
+			Writer.WriteInt(DateTime.Now.Year);
+			Writer.WriteInt(DateTime.Now.Month);
+			Writer.WriteInt(DateTime.Now.Year);
+			Writer.WriteInt(DateTime.Now.Month - 1);
+		}
+	}
 }

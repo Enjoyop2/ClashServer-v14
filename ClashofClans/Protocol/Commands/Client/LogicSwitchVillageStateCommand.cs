@@ -1,26 +1,26 @@
-﻿using ClashofClans.Logic;
+using ClashofClans.Logic;
 using ClashofClans.Utilities.Netty;
 
 namespace ClashofClans.Protocol.Commands.Client
 {
-    public class LogicSwitchVillageStateCommand : LogicCommand
-    {
-        public LogicSwitchVillageStateCommand(Device device, ByteBuffer buffer) : base(device, buffer)
-        {
-        }
+	public class LogicSwitchVillageStateCommand : LogicCommand
+	{
+		public LogicSwitchVillageStateCommand(Device device, ByteBuffer buffer) : base(device, buffer)
+		{
+		}
 
-        public int State { get; set; }
+		public int State { get; set; }
 
-        public override void Decode()
-        {
-            State = Reader.ReadInt();
+		public override void Decode()
+		{
+			State = Reader.ReadInt();
 
-            base.Decode();
-        }
+			base.Decode();
+		}
 
-        public override void Execute()
-        {
-            Device.Player.Home.State = State;
-        }
-    }
+		public override void Execute()
+		{
+			Device.Player.Home.State = State;
+		}
+	}
 }

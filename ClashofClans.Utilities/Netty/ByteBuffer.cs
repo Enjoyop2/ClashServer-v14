@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ClashofClans.Utilities.Compression.ZLib;
+using DotNetty.Buffers;
+using System;
 using System.Linq;
 using System.Text;
-using DotNetty.Buffers;
-using ClashofClans.Utilities.Compression.ZLib;
 
 namespace ClashofClans.Utilities.Netty
 {
@@ -105,7 +105,7 @@ namespace ClashofClans.Utilities.Netty
 
         public void WriteMedium(int value)
         {
-            _bitIdx= 0;
+            _bitIdx = 0;
             _offset = 0;
 
             _buffer.WriteMedium(value);
@@ -158,7 +158,7 @@ namespace ClashofClans.Utilities.Netty
             }
             else
             {
-                var bytes = Encoding.UTF8.GetBytes(value);
+                byte[] bytes = Encoding.UTF8.GetBytes(value);
 
                 _buffer.WriteInt(bytes.Length);
                 _buffer.WriteString(value, Encoding.UTF8);
@@ -170,8 +170,8 @@ namespace ClashofClans.Utilities.Netty
             _bitIdx = 0;
             _offset = 0;
 
-            var temp = (value >> 25) & 0x40;
-            var flipped = value ^ (value >> 31);
+            int temp = (value >> 25) & 0x40;
+            int flipped = value ^ (value >> 31);
 
             temp |= value & 0x3F;
             value >>= 6;
@@ -196,7 +196,7 @@ namespace ClashofClans.Utilities.Netty
             _bitIdx = 0;
             _offset = 0;
 
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
                 _buffer.WriteByte(0x7F);
         }
 
@@ -205,8 +205,8 @@ namespace ClashofClans.Utilities.Netty
             _bitIdx = 0;
             _offset = 0;
 
-            var data = Encoding.UTF8.GetBytes(value);
-            var compressed = ZlibStream.CompressBuffer(data, CompressionLevel.BestCompression);
+            byte[] data = Encoding.UTF8.GetBytes(value);
+            byte[] compressed = ZlibStream.CompressBuffer(data, CompressionLevel.BestCompression);
 
             if (indicate)
                 _buffer.WriteByte(1);
@@ -222,7 +222,7 @@ namespace ClashofClans.Utilities.Netty
             _bitIdx = 0;
             _offset = 0;
 
-            var tmp = value.Replace("-", string.Empty).Replace(" ", string.Empty);
+            string tmp = value.Replace("-", string.Empty).Replace(" ", string.Empty);
             _buffer.WriteBytes(Enumerable.Range(0, tmp.Length).Where(x => x % 2 == 0)
                 .Select(x => Convert.ToByte(tmp.Substring(x, 2), 16)).ToArray());
         }
@@ -373,7 +373,7 @@ namespace ClashofClans.Utilities.Netty
             _bitIdx = 0;
             _currentByte = 0;
 
-            var length = _buffer.ReadInt();
+            int length = _buffer.ReadInt();
 
             if (length <= 0 || length > 900000)
                 return string.Empty;
@@ -389,10 +389,10 @@ namespace ClashofClans.Utilities.Netty
             if (indicator)
                 _buffer.ReadByte();
 
-            var compressedLength = _buffer.ReadInt() - 4;
+            int compressedLength = _buffer.ReadInt() - 4;
             _buffer.ReadIntLE();
 
-            var compressedBytes = _buffer.ReadBytes(compressedLength);
+            IByteBuffer compressedBytes = _buffer.ReadBytes(compressedLength);
 
             return ZlibStream.UncompressString(compressedBytes.Array);
         }
@@ -404,7 +404,7 @@ namespace ClashofClans.Utilities.Netty
 
             int b, sign = ((b = _buffer.ReadByte()) >> 6) & 1, i = b & 0x3F, offset = 6;
 
-            for (var j = 0; j < 4 && (b & 0x80) != 0; j++, offset += 7)
+            for (int j = 0; j < 4 && (b & 0x80) != 0; j++, offset += 7)
                 i |= ((b = _buffer.ReadByte()) & 0x7F) << offset;
 
             return (b & 0x80) != 0 ? -1 : i | (sign == 1 && offset < 32 ? i | (int)(0xFFFFFFFF << offset) : i);

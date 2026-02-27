@@ -62,7 +62,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             {
                 if (Z != null) return Z;
 
-                var wantRfc1950Header = Flavor == ZlibStreamFlavor.Zlib;
+                bool wantRfc1950Header = Flavor == ZlibStreamFlavor.Zlib;
                 Z = new ZlibCodec();
                 if (CompressionMode == CompressionMode.Decompress)
                 {
@@ -115,7 +115,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 Z.OutputBuffer = WorkingBuffer;
                 Z.NextOut = 0;
                 Z.AvailableBytesOut = _workingBuffer.Length;
-                var rc = WantCompress
+                int rc = WantCompress
                     ? Z.Deflate(FlushMode)
                     : Z.Inflate();
                 if (rc != ZlibConstants.ZOk && rc != ZlibConstants.ZStreamEnd)
@@ -138,102 +138,102 @@ namespace ClashofClans.Utilities.Compression.ZLib
             switch (_streamMode)
             {
                 case StreamMode.Writer:
-                {
-                    bool done;
-                    do
                     {
-                        Z.OutputBuffer = WorkingBuffer;
-                        Z.NextOut = 0;
-                        Z.AvailableBytesOut = _workingBuffer.Length;
-                        var rc = WantCompress
-                            ? Z.Deflate(FlushType.Finish)
-                            : Z.Inflate();
-
-                        if (rc != ZlibConstants.ZStreamEnd && rc != ZlibConstants.ZOk)
+                        bool done;
+                        do
                         {
-                            var verb = (WantCompress ? "de" : "in") + "flating";
-                            if (Z.Message == null)
-                                throw new ZlibException($"{verb}: (rc = {rc})");
+                            Z.OutputBuffer = WorkingBuffer;
+                            Z.NextOut = 0;
+                            Z.AvailableBytesOut = _workingBuffer.Length;
+                            int rc = WantCompress
+                                ? Z.Deflate(FlushType.Finish)
+                                : Z.Inflate();
 
-                            throw new ZlibException(verb + ": " + Z.Message);
-                        }
-
-                        if (_workingBuffer.Length - Z.AvailableBytesOut > 0)
-                            Stream.Write(_workingBuffer, 0, _workingBuffer.Length - Z.AvailableBytesOut);
-
-                        done = Z.AvailableBytesIn == 0 && Z.AvailableBytesOut != 0;
-                        if (Flavor == ZlibStreamFlavor.Gzip && !WantCompress)
-                            done = Z.AvailableBytesIn == 8 && Z.AvailableBytesOut != 0;
-                    } while (!done);
-
-                    Flush();
-
-                    if (Flavor == ZlibStreamFlavor.Gzip)
-                    {
-                        if (WantCompress)
-                        {
-                            var c1 = _crc.Crc32Result;
-                            Stream.Write(BitConverter.GetBytes(c1), 0, 4);
-                            var c2 = (int) (_crc.TotalBytesRead & 0x00000000FFFFFFFF);
-                            Stream.Write(BitConverter.GetBytes(c2), 0, 4);
-                        }
-                        else
-                        {
-                            throw new ZlibException("Writing with decompression is not supported.");
-                        }
-                    }
-
-                    break;
-                }
-
-                case StreamMode.Reader:
-                {
-                    if (Flavor == ZlibStreamFlavor.Gzip)
-                    {
-                        if (!WantCompress)
-                        {
-                            if (Z.TotalBytesOut == 0L)
-                                return;
-
-                            var trailer = new byte[8];
-
-                            if (Z.AvailableBytesIn < 8)
+                            if (rc != ZlibConstants.ZStreamEnd && rc != ZlibConstants.ZOk)
                             {
-                                Array.Copy(Z.InputBuffer, Z.NextIn, trailer, 0, Z.AvailableBytesIn);
-                                var bytesNeeded = 8 - Z.AvailableBytesIn;
-                                var bytesRead = Stream.Read(trailer,
-                                    Z.AvailableBytesIn,
-                                    bytesNeeded);
-                                if (bytesNeeded != bytesRead)
-                                    throw new ZlibException(
-                                        $"Missing or incomplete GZIP trailer. Expected 8 bytes, got {Z.AvailableBytesIn + bytesRead}.");
+                                string verb = (WantCompress ? "de" : "in") + "flating";
+                                if (Z.Message == null)
+                                    throw new ZlibException($"{verb}: (rc = {rc})");
+
+                                throw new ZlibException(verb + ": " + Z.Message);
+                            }
+
+                            if (_workingBuffer.Length - Z.AvailableBytesOut > 0)
+                                Stream.Write(_workingBuffer, 0, _workingBuffer.Length - Z.AvailableBytesOut);
+
+                            done = Z.AvailableBytesIn == 0 && Z.AvailableBytesOut != 0;
+                            if (Flavor == ZlibStreamFlavor.Gzip && !WantCompress)
+                                done = Z.AvailableBytesIn == 8 && Z.AvailableBytesOut != 0;
+                        } while (!done);
+
+                        Flush();
+
+                        if (Flavor == ZlibStreamFlavor.Gzip)
+                        {
+                            if (WantCompress)
+                            {
+                                int c1 = _crc.Crc32Result;
+                                Stream.Write(BitConverter.GetBytes(c1), 0, 4);
+                                int c2 = (int)(_crc.TotalBytesRead & 0x00000000FFFFFFFF);
+                                Stream.Write(BitConverter.GetBytes(c2), 0, 4);
                             }
                             else
                             {
-                                Array.Copy(Z.InputBuffer, Z.NextIn, trailer, 0, trailer.Length);
+                                throw new ZlibException("Writing with decompression is not supported.");
                             }
-
-                            var crc32Expected = BitConverter.ToInt32(trailer, 0);
-                            var crc32Actual = _crc.Crc32Result;
-                            var isizeExpected = BitConverter.ToInt32(trailer, 4);
-                            var isizeActual = (int) (Z.TotalBytesOut & 0x00000000FFFFFFFF);
-
-                            if (crc32Actual != crc32Expected)
-                                throw new ZlibException(
-                                    $"Bad CRC32 in GZIP trailer. (actual({crc32Actual:X8})!=expected({crc32Expected:X8}))");
-
-                            if (isizeActual != isizeExpected)
-                                throw new ZlibException(
-                                    $"Bad size in GZIP trailer. (actual({isizeActual})!=expected({isizeExpected}))");
                         }
-                        else
-                        {
-                            throw new ZlibException("Reading with compression is not supported.");
-                        }
+
+                        break;
                     }
 
-                    break;
-                }
+                case StreamMode.Reader:
+                    {
+                        if (Flavor == ZlibStreamFlavor.Gzip)
+                        {
+                            if (!WantCompress)
+                            {
+                                if (Z.TotalBytesOut == 0L)
+                                    return;
+
+                                byte[] trailer = new byte[8];
+
+                                if (Z.AvailableBytesIn < 8)
+                                {
+                                    Array.Copy(Z.InputBuffer, Z.NextIn, trailer, 0, Z.AvailableBytesIn);
+                                    int bytesNeeded = 8 - Z.AvailableBytesIn;
+                                    int bytesRead = Stream.Read(trailer,
+                                        Z.AvailableBytesIn,
+                                        bytesNeeded);
+                                    if (bytesNeeded != bytesRead)
+                                        throw new ZlibException(
+                                            $"Missing or incomplete GZIP trailer. Expected 8 bytes, got {Z.AvailableBytesIn + bytesRead}.");
+                                }
+                                else
+                                {
+                                    Array.Copy(Z.InputBuffer, Z.NextIn, trailer, 0, trailer.Length);
+                                }
+
+                                int crc32Expected = BitConverter.ToInt32(trailer, 0);
+                                int crc32Actual = _crc.Crc32Result;
+                                int isizeExpected = BitConverter.ToInt32(trailer, 4);
+                                int isizeActual = (int)(Z.TotalBytesOut & 0x00000000FFFFFFFF);
+
+                                if (crc32Actual != crc32Expected)
+                                    throw new ZlibException(
+                                        $"Bad CRC32 in GZIP trailer. (actual({crc32Actual:X8})!=expected({crc32Expected:X8}))");
+
+                                if (isizeActual != isizeExpected)
+                                    throw new ZlibException(
+                                        $"Bad size in GZIP trailer. (actual({isizeActual})!=expected({isizeExpected}))");
+                            }
+                            else
+                            {
+                                throw new ZlibException("Reading with compression is not supported.");
+                            }
+                        }
+
+                        break;
+                    }
             }
         }
 
@@ -282,11 +282,11 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         private string ReadZeroTerminatedString()
         {
-            var list = new List<byte>();
-            var done = false;
+            List<byte> list = new List<byte>();
+            bool done = false;
             do
             {
-                var n = Stream.Read(Buf1, 0, 1);
+                int n = Stream.Read(Buf1, 0, 1);
                 if (n != 1)
                     throw new ZlibException("Unexpected EOF reading GZIP header.");
 
@@ -296,15 +296,15 @@ namespace ClashofClans.Utilities.Compression.ZLib
                     list.Add(Buf1[0]);
             } while (!done);
 
-            var a = list.ToArray();
+            byte[] a = list.ToArray();
             return GZipStream.Iso8859dash1.GetString(a, 0, a.Length);
         }
 
         private int ReadAndValidateGzipHeader()
         {
-            var totalBytesRead = 0;
-            var header = new byte[10];
-            var n = Stream.Read(header, 0, header.Length);
+            int totalBytesRead = 0;
+            byte[] header = new byte[10];
+            int n = Stream.Read(header, 0, header.Length);
 
             if (n == 0)
                 return 0;
@@ -315,7 +315,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (header[0] != 0x1F || header[1] != 0x8B || header[2] != 8)
                 throw new ZlibException("Bad GZIP header.");
 
-            var timet = BitConverter.ToInt32(header, 4);
+            int timet = BitConverter.ToInt32(header, 4);
             GzipMtime = GZipStream.UnixEpoch.AddSeconds(timet);
             totalBytesRead += n;
             if ((header[3] & 0x04) == 0x04)
@@ -323,8 +323,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 n = Stream.Read(header, 0, 2);
                 totalBytesRead += n;
 
-                var extraLength = (short) (header[0] + header[1] * 256);
-                var extra = new byte[extraLength];
+                short extraLength = (short)(header[0] + header[1] * 256);
+                byte[] extra = new byte[extraLength];
                 n = Stream.Read(extra, 0, extra.Length);
                 if (n != extraLength)
                     throw new ZlibException("Unexpected end-of-file reading GZIP header.");
@@ -427,7 +427,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static void CompressString(string s, Stream compressor)
         {
-            var uncompressed = Encoding.UTF8.GetBytes(s);
+            byte[] uncompressed = Encoding.UTF8.GetBytes(s);
             using (compressor)
             {
                 compressor.Write(uncompressed, 0, uncompressed.Length);
@@ -444,9 +444,9 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public static string UncompressString(Stream decompressor)
         {
-            var working = new byte[1024];
-            var encoding = Encoding.UTF8;
-            using (var output = new MemoryStream())
+            byte[] working = new byte[1024];
+            Encoding encoding = Encoding.UTF8;
+            using (MemoryStream output = new MemoryStream())
             {
                 using (decompressor)
                 {
@@ -455,15 +455,15 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 }
 
                 output.Seek(0, SeekOrigin.Begin);
-                var sr = new StreamReader(output, encoding);
+                StreamReader sr = new StreamReader(output, encoding);
                 return sr.ReadToEnd();
             }
         }
 
         public static byte[] UncompressBuffer(Stream decompressor)
         {
-            var working = new byte[1024];
-            using (var output = new MemoryStream())
+            byte[] working = new byte[1024];
+            using (MemoryStream output = new MemoryStream())
             {
                 using (decompressor)
                 {

@@ -21,7 +21,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             int ix)
         {
             Buffer = new byte[size];
-            var n = size + (size / 32768 + 1) * 5 * 2;
+            int n = size + (size / 32768 + 1) * 5 * 2;
             Compressed = new byte[n];
             Compressor = new ZlibCodec();
             Compressor.InitializeDeflate(compressLevel, false);
@@ -139,9 +139,9 @@ namespace ClashofClans.Utilities.Compression.ZLib
             _toWrite = new Queue<int>();
             _toFill = new Queue<int>();
             _pool = new List<WorkItem>();
-            var nTasks = BufferPairsPerCore * Environment.ProcessorCount;
+            int nTasks = BufferPairsPerCore * Environment.ProcessorCount;
             nTasks = Math.Min(nTasks, _maxBufferPairs);
-            for (var i = 0; i < nTasks; i++)
+            for (int i = 0; i < nTasks; i++)
             {
                 _pool.Add(new WorkItem(_bufferSize, _compressLevel, i));
                 _toFill.Enqueue(i);
@@ -157,7 +157,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            var mustWait = false;
+            bool mustWait = false;
 
             if (_isClosed)
                 throw new InvalidOperationException();
@@ -165,7 +165,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (_pendingException != null)
             {
                 _handlingException = true;
-                var pe = _pendingException;
+                Exception pe = _pendingException;
                 _pendingException = null;
                 throw pe;
             }
@@ -201,9 +201,9 @@ namespace ClashofClans.Utilities.Compression.ZLib
                     ++_lastFilled;
                 }
 
-                var workitem = _pool[ix];
+                WorkItem workitem = _pool[ix];
 
-                var limit = workitem.Buffer.Length - workitem.InputBytesAvailable > count
+                int limit = workitem.Buffer.Length - workitem.InputBytesAvailable > count
                     ? count
                     : workitem.Buffer.Length - workitem.InputBytesAvailable;
 
@@ -234,8 +234,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         private void FlushFinish()
         {
-            var buffer = new byte[128];
-            var compressor = new ZlibCodec
+            byte[] buffer = new byte[128];
+            ZlibCodec compressor = new ZlibCodec
             {
                 InputBuffer = null,
                 NextIn = 0,
@@ -245,7 +245,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
                 AvailableBytesOut = buffer.Length
             };
 
-            var rc = compressor.Deflate(FlushType.Finish);
+            int rc = compressor.Deflate(FlushType.Finish);
 
             if (rc != ZlibConstants.ZStreamEnd && rc != ZlibConstants.ZOk)
                 throw new Exception("deflating: " + compressor.Message);
@@ -268,7 +268,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             if (_currentlyFilling >= 0)
             {
-                var workitem = _pool[_currentlyFilling];
+                WorkItem workitem = _pool[_currentlyFilling];
                 DeflateOne(workitem);
                 _currentlyFilling = -1;
             }
@@ -289,7 +289,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (_pendingException != null)
             {
                 _handlingException = true;
-                var pe = _pendingException;
+                Exception pe = _pendingException;
                 _pendingException = null;
                 throw pe;
             }
@@ -305,7 +305,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
             if (_pendingException != null)
             {
                 _handlingException = true;
-                var pe = _pendingException;
+                Exception pe = _pendingException;
                 _pendingException = null;
                 throw pe;
             }
@@ -338,7 +338,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             _toWrite.Clear();
             _toFill.Clear();
-            foreach (var workitem in _pool)
+            foreach (WorkItem workitem in _pool)
             {
                 _toFill.Enqueue(workitem.Index);
                 workitem.Ordinal = -1;
@@ -366,8 +366,8 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             do
             {
-                var firstSkip = -1;
-                var millisecondsToWait = doAll ? 200 : mustWait ? -1 : 0;
+                int firstSkip = -1;
+                int millisecondsToWait = doAll ? 200 : mustWait ? -1 : 0;
                 int nextToWrite;
                 do
                 {
@@ -386,7 +386,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
                         if (nextToWrite < 0) continue;
 
-                        var workitem = _pool[nextToWrite];
+                        WorkItem workitem = _pool[nextToWrite];
                         if (workitem.Ordinal != _lastWritten + 1)
                         {
                             lock (_toWrite)
@@ -432,10 +432,10 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         private void DeflateOne(object wi)
         {
-            var workitem = (WorkItem) wi;
+            WorkItem workitem = (WorkItem)wi;
             try
             {
-                var crc = new Crc32();
+                Crc32 crc = new Crc32();
 
                 crc.SlurpBlock(workitem.Buffer, 0, workitem.InputBytesAvailable);
 
@@ -468,7 +468,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
         private bool DeflateOneSegment(WorkItem workitem)
         {
-            var compressor = workitem.Compressor;
+            ZlibCodec compressor = workitem.Compressor;
             compressor.ResetDeflate();
             compressor.NextIn = 0;
 
@@ -483,7 +483,7 @@ namespace ClashofClans.Utilities.Compression.ZLib
 
             compressor.Deflate(FlushType.Sync);
 
-            workitem.CompressedBytesAvailable = (int) compressor.TotalBytesOut;
+            workitem.CompressedBytesAvailable = (int)compressor.TotalBytesOut;
             return true;
         }
 
