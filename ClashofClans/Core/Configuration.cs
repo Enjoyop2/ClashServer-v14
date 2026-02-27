@@ -18,8 +18,8 @@ namespace ClashofClans.Core
 			Formatting = Formatting.None
 		};
 
-		[JsonProperty("encryption_key")] public string EncryptionKey = "xpn9kw85qa8shqtka36adqjnrdekg7pq";
-		[JsonProperty("encryption_nonce")] public string EncryptionNonce = "86rfwfzxzynsfa5xz5njdxsfkh4cesau";
+		[JsonProperty("encryption_key")] public string EncryptionKey = "fhsd6f86f67rt8fw78fw789we78r9789wer6re";
+		[JsonProperty("encryption_nonce")] public string EncryptionNonce = "nonce";
 
 		[JsonProperty("mysql_database")] public string MySqlDatabase = "magic-database";
 		[JsonProperty("mysql_password")] public string MySqlPassword = "";

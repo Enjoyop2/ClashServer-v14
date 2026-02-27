@@ -26,8 +26,8 @@ Check the config.json file inside the server software:
 
 ```json
 {
-  "encryption_key": "xpn9kw85qa8shqtka36adqjnrdekg7pq",
-  "encryption_nonce": "86rfwfzxzynsfa5xz5njdxsfkh4cesau",
+  "encryption_key": "fhsd6f86f67rt8fw78fw789we78r9789wer6re",
+  "encryption_nonce": "nonce",
   "mysql_database": "magic-database",
   "mysql_password": "",
   "mysql_server": "127.0.0.1",
